@@ -19,7 +19,7 @@ class VideoController extends Controller
         $this->repository = $repository;
     }
 
-  public function index()
+    public function index()
     {
         $data = $this->repository->all();
         return view('admin.modules.video.index', compact('data'));
@@ -44,7 +44,7 @@ class VideoController extends Controller
         $data = $request->validated();
         try {
             $videoId = $this->repository->uploadVideoToYouTube(
-                $request->file('video'), 
+                $request->file('video'),
                 $data['title'],
                 $data['description'],
             );
@@ -61,12 +61,12 @@ class VideoController extends Controller
     public function edit($id)
     {
         $video = $this->repository->find($id);
-         $topics = Topic::all();
-         $guides = Guide::all();
+        $topics = Topic::all();
+        $guides = Guide::all();
         $levels = Level::all();
         $countries = Country::all();
 
-        return view('admin.modules.video.edit', compact('video','topics','countries', 'levels', 'guides'));
+        return view('admin.modules.video.edit', compact('video', 'topics', 'countries', 'levels', 'guides'));
     }
     public function update(Request $request, $id)
     {
@@ -107,14 +107,13 @@ class VideoController extends Controller
         $this->repository->handleGoogleCallback($request->get('code'));
         return redirect()->route('admin.video.index')->with('success', 'Google Authentication Successful');
     }
-    
-        public function fetchChannelVideos()
+
+    public function fetchChannelVideos()
     {
         $data = $this->repository->getChannelVideos('UCWlbdVKAcA9kvjp2ag7Rt2w');
-        if($data['path'] == 'invalid_grant')
-        {
+        if ($data['path'] == 'invalid_grant') {
             return redirect($data['authUrl']);
         }
-        return redirect()->back()->with('success','Videos fetched successfully.');
+        return redirect()->back()->with('success', 'Videos fetched successfully.');
     }
 }

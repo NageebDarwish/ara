@@ -21,9 +21,10 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->repository->index();
+        $perPage = $request->get('per_page', 10);
+        $users = $this->repository->index($perPage);
 
         return view('admin.modules.users.index', compact('users'));
     }
@@ -32,8 +33,8 @@ class UserController extends Controller
     {
         $user = $this->repository->findOrFail($id);
         if ($user) {
-           
-            $modals=BadgeModal::where('user_id',$user->id)->delete();
+
+            $modals = BadgeModal::where('user_id', $user->id)->delete();
 
             $user->delete();
             return redirect()->back()->with('success', 'User deleted successfully');

@@ -10,18 +10,18 @@
 </head>
 
 <body>
-    
+
     @include('admin.layout.components.navbar')
     <div class="container-fluid page-body-wrapper">
-    @include('admin.layout.components.sidebar')
-    <div class="main-panel">
-        <div class="content-wrapper">
-            @yield('content')
+        @include('admin.layout.components.sidebar')
+        <div class="main-panel">
+            <div class="content-wrapper">
+                @yield('content')
+            </div>
         </div>
     </div>
-    </div>
 
-    @include('admin.layout.components.footer')
+    {{-- @include('admin.layout.components.footer') --}}
     @include('admin.layout.components.js')
 
 </body>

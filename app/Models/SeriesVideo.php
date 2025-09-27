@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SeriesVideo extends Model
 {
     use HasFactory;
-    protected $fillable=[
+    protected $fillable = [
         'title',
         'description',
         'video',
@@ -24,7 +24,7 @@ class SeriesVideo extends Model
         'duration_seconds',
     ];
 
-    protected $with=['timeline'];
+    protected $with = ['timeline'];
     public function series()
     {
         return $this->belongsTo(Series::class);
@@ -39,19 +39,18 @@ class SeriesVideo extends Model
         return $this->morphMany(VideoHistory::class, 'history');
     }
 
-  public function timeline()
+    public function timeline()
     {
-        return $this->hasMany(VideoSeriesTimeline::class,'series_video_id');
+        return $this->hasMany(VideoSeriesTimeline::class, 'series_video_id');
     }
 
     public function hideVideos()
     {
         return $this->hasMany(HideVideo::class);
     }
-    
-     public function comments()
-    {
-        return $this->morphMany(Comment::class,'commentable');
-    }
 
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 }

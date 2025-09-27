@@ -16,7 +16,7 @@ class UserRepository
 
     public function index()
     {
-       return $this->model::whereIn('role', ['user','manager'])->get();
+        return $this->model::whereIn('role', ['user', 'manager'])->get();
     }
 
     public function findOrFail($id)
