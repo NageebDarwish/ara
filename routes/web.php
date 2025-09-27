@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\NewsLetterController;
 use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\PermissionController;
 
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
@@ -30,6 +31,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
     Route::resource('topic', TopicController::class);
     Route::resource('guides', GuideController::class);
     Route::resource('levels', LevelController::class);
+    
+    // Permissions routes
+    Route::post('/permissions/toggle', [PermissionController::class, 'toggle'])->name('permissions.toggle');
     Route::resource('country', CountryController::class);
     Route::resource('video', VideoController::class);
     Route::get('fetchVideos', [VideoController::class, 'fetchChannelVideos'])->name('video.fetchVideos');

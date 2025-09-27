@@ -15,6 +15,11 @@
                     <li class="nav-item">
                         <a class="nav-link" id="managers-tab" data-toggle="tab" href="#managers" role="tab">Managers</a>
                     </li>
+                    @if(auth()->user()->hasRole('super-admin'))
+                    <li class="nav-item">
+                        <a class="nav-link" id="permissions-tab" data-toggle="tab" href="#permissions" role="tab">Permissions</a>
+                    </li>
+                    @endif
                 </ul>
 
                 <!-- Tab Content -->
@@ -111,6 +116,58 @@
                             </table>
                         </div>
                     </div>
+                    
+                    <!-- Permissions Tab -->
+                    @if(auth()->user()->hasRole('super-admin'))
+                    <div class="tab-pane fade" id="permissions" role="tabpanel">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Manage Admin Permissions</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Admin</th>
+                                                        @foreach(\Spatie\Permission\Models\Permission::all() as $permission)
+                                                            <th>{{ ucwords(str_replace('_', ' ', $permission->name)) }}</th>
+                                                        @endforeach
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($users->where('role', 'manager') as $admin)
+                                                        <tr>
+                                                            <td>{{ $admin->name }}</td>
+                                                            @foreach(\Spatie\Permission\Models\Permission::all() as $permission)
+                                                                <td>
+                                                                    <form action="{{ route('admin.permissions.toggle') }}" method="POST">
+                                                                        @csrf
+                                                                        <input type="hidden" name="user_id" value="{{ $admin->id }}">
+                                                                        <input type="hidden" name="permission" value="{{ $permission->name }}">
+                                                                        <div class="custom-control custom-switch">
+                                                                            <input type="checkbox" class="custom-control-input permission-toggle" 
+                                                                                id="permission_{{ $admin->id }}_{{ $permission->id }}"
+                                                                                {{ $admin->hasPermissionTo($permission->name) ? 'checked' : '' }}
+                                                                                onchange="this.form.submit()">
+                                                                            <label class="custom-control-label" for="permission_{{ $admin->id }}_{{ $permission->id }}"></label>
+                                                                        </div>
+                                                                    </form>
+                                                                </td>
+                                                            @endforeach
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
