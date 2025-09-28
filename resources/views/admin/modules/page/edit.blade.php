@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-2">
+    <div class="mt-2">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Edit Page</h3>

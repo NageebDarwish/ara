@@ -33,21 +33,18 @@ class SeriesController extends Controller
             return redirect()->away($authUrl);
         }
 
-        $topics = Topic::all();
         $countries = Country::all();
-        $guides = Guide::all();
         $levels = Level::all();
-        return view('admin.modules.series.create',compact('topics','countries', 'guides', 'levels'));
+        return view('admin.modules.series.create',compact('countries', 'levels'));
     }
 
    public function store(SeriesRequest $request)
     {
         // dd($request->all());
         // Validate the request data
-        $seriesData = $request->only(['level_id', 'guide_id', 'topic_id', 'country_id', 'title', 'description']);
+        $seriesData = $request->only(['level_id', 'country_id', 'title', 'description']);
         $videoTitles = $request->input('video_title');
         $videoDescriptions = $request->input('video_description');
-        $plan = $request->input('plan');
         $videos = $request->file('videos');
 
         $videosData = [];
@@ -61,9 +58,8 @@ class SeriesController extends Controller
 
                 $videoId = $this->repository->uploadVideoToYouTube(
                     $videoFile,
-                    $videoTitles[$index], 
+                    $videoTitles[$index],
                     $videoDescriptions[$index],
-                    $plan[$index]
                 );
 
 
@@ -71,7 +67,6 @@ class SeriesController extends Controller
                     'video' => $videoId,
                     'title' => $videoTitles[$index],
                     'description' => $videoDescriptions[$index],
-                    'plan'  => $plan[$index]
                 ];
                 sleep(2);
             }
@@ -87,13 +82,11 @@ class SeriesController extends Controller
 
     public function edit($id)
     {
-        $topics = Topic::all();
         $countries = Country::all();
-        $guides = Guide::all();
         $levels = Level::all();
         $series = $this->repository->find($id);
 
-        return view('admin.modules.series.edit', compact('series','countries','topics', 'guides', 'levels'));
+        return view('admin.modules.series.edit', compact('series','countries','levels'));
     }
 
     public function update(Request $request, $id)
@@ -163,15 +156,15 @@ class SeriesController extends Controller
     public function getVideosWithPlan(Request $request)
     {
         $seriesId = $request->get('series_id');
-        $videos = SeriesVideo::where('series_id', $seriesId)->get();  
+        $videos = SeriesVideo::where('series_id', $seriesId)->get();
 
         return response()->json([
             'success' => true,
             'data' => ['videos' => $videos]
         ]);
     }
-    
-    
+
+
     public function fetchChannelSeries()
     {
         $data = $this->repository->getPlaylistsAndItems('UCWlbdVKAcA9kvjp2ag7Rt2w');

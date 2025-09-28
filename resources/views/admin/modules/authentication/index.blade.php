@@ -13,11 +13,11 @@
 </head>
 <body>
     <section class="d-flex align-items-center justify-content-center" style="min-height: 100vh;" >
-        <div class="container">
+        <div class="">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
                     <div class="card shadow-sm">
-                        <div class="card-body p-4" 
+                        <div class="card-body p-4"
                             {{-- <div class="text-center mb-4">
                                 <a href="#!">
                                     <img src="{{ asset('img/1.png') }}" alt="Logo" width="250" height="200" class="img-fluid">

@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Edit Blog Post</h6>
@@ -127,7 +127,7 @@
         </div>
     </div>
 
-   
+
    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
     <script>
@@ -145,5 +145,61 @@
             //     ['view', ['fullscreen', 'codeview', 'help']]
             // ]
         });
+    </script>
+    <script>
+        (function () {
+            function slugify(value) {
+                const arabicDiacritics = /[\u064B-\u065F\u0670\u06D6-\u06ED]/g; // Arabic vowel marks
+                const arabicTatweel = /\u0640/g; // Tatweel
+                let str = (value || '')
+                    .normalize('NFKD')
+                    .replace(/[\u0300-\u036f]/g, '') // remove Latin diacritics
+                    .replace(arabicDiacritics, '')
+                    .replace(arabicTatweel, '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\u0600-\u06FF\s-_]/g, '') // keep Arabic, latin, numbers, space, hyphen, underscore
+                    .trim()
+                    .replace(/[\s_]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                return str;
+            }
+
+            const titleEl = document.getElementById('title');
+            const slugEl = document.getElementById('slug');
+            let slugManuallyEdited = false;
+            let lastAutoSlug = '';
+
+            if (titleEl && slugEl) {
+                // Auto-fill slug from title while not manually edited or slug empty
+                titleEl.addEventListener('input', function () {
+                    if (!slugManuallyEdited || slugEl.value.trim() === '' || slugEl.value === lastAutoSlug) {
+                        lastAutoSlug = slugify(titleEl.value);
+                        slugEl.value = lastAutoSlug;
+                    }
+                });
+
+                // Detect manual edits
+                slugEl.addEventListener('input', function () {
+                    slugManuallyEdited = true;
+                });
+
+                // Sanitize slug on blur/change (correct wrong slug)
+                ['blur', 'change'].forEach(function (ev) {
+                    slugEl.addEventListener(ev, function () {
+                        const cleaned = slugify(slugEl.value);
+                        slugEl.value = cleaned;
+                        lastAutoSlug = cleaned;
+                    });
+                });
+            }
+
+            // Init summernote
+            $('.summernote').summernote({
+                placeholder: 'Type your content here...',
+                tabsize: 2,
+                height: null,
+            });
+        })();
     </script>
 @endsection

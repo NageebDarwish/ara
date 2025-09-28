@@ -1,6 +1,6 @@
 @extends('admin.layout.layout')
 @section('content')
-    <div class="container-fluid p-4 dashboard-container">
+    <div class=" p-4 dashboard-container">
         <!-- Welcome Section -->
         <div class="welcome-card mb-4">
             <div class="row g-0">

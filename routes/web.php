@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\NewsLetterController;
 use App\Http\Controllers\Admin\ManagerController;
@@ -49,6 +50,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
     Route::delete('users/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
 
     Route::resource('blog', BlogController::class);
+    Route::resource('category', CategoryController::class);
     Route::get('contactus', [ContactUsController::class, 'index'])->name('contactus.index');
     Route::delete('contactus/{id}', [ContactUsController::class, 'destroy'])->name('contactus.destroy');
     Route::post('contactus/reply', [ContactUsController::class, 'reply'])->name('contactus.reply');

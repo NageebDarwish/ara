@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container py-4">
+    <div class="py-4">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <h2 class="mb-0">Contact Messages</h2>
             <div class="d-flex gap-4 align-items-center flex-wrap">

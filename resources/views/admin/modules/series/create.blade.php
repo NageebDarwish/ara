@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Create New Series</h3>
@@ -28,37 +28,6 @@
                         @enderror
                     </div>
 
-                    <!-- Topic Selection -->
-                    <div class="form-group">
-                        <label for="topic_id">Topic</label>
-                        <select name="topic_id" id="topic_id" class="form-control" required>
-                            <option value="">Select Topic</option>
-                            @foreach ($topics as $topic)
-                                <option value="{{ $topic->id }}" {{ old('topic_id') == $topic->id ? 'selected' : '' }}>
-                                    {{ $topic->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('topic_id')
-                            <span class="text-danger">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Guide Selection -->
-                    <div class="form-group">
-                        <label for="guide_id">Guide</label>
-                        <select name="guide_id" id="guide_id" class="form-control" required>
-                            <option value="">Select Guide</option>
-                            @foreach ($guides as $guide)
-                                <option value="{{ $guide->id }}" {{ old('guide_id') == $guide->id ? 'selected' : '' }}>
-                                    {{ $guide->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('guide_id')
-                            <span class="text-danger">{{ $message }}</span>
-                        @enderror
-                    </div>
 
                     <div class="form-group">
                         <label for="title">Series Title</label>
@@ -92,7 +61,7 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
 
-                            <div class="form-group mt-3">
+                            {{-- <div class="form-group mt-3">
                                 <label for="plan[]">Plan</label>
                                 <select name="plan[]" class="form-control">
                                     <option value="free">Free</option>
@@ -101,7 +70,7 @@
                                 @error('plan.*')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <label for="video_file">Upload Video File</label>
                             <input type="file" name="videos[]" class="form-control-file border" accept="video/*">

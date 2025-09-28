@@ -17,29 +17,20 @@
         </li>
         @endif
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.topic.index') }}">
-                <span class="icon-bg"><i class="mdi mdi-crosshairs-gps menu-icon"></i></span>
-                <span class="menu-title">Topics</span>
-
+            <a class="nav-link" data-toggle="collapse" href="#filterMenu" aria-expanded="false" aria-controls="filterMenu">
+                <span class="icon-bg"><i class="mdi mdi-filter-outline menu-icon"></i></span>
+                <span class="menu-title">Filters</span>
+                <i class="menu-arrow" style="transform: rotate(180deg)"></i>
             </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.levels.index') }}">
-                <span class="icon-bg"><i class="mdi mdi-crosshairs-gps menu-icon"></i></span>
-                <span class="menu-title">Levels</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.guides.index') }}">
-                <span class="icon-bg"><i class="mdi mdi-crosshairs-gps menu-icon"></i></span>
-                <span class="menu-title">Guides</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.country.index') }}">
-                <span class="icon-bg"><i class="mdi mdi-contacts menu-icon"></i></span>
-                <span class="menu-title">Country</span>
-            </a>
+            <div class="collapse" id="filterMenu">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.topic.index') }}">Topics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.guides.index') }}">Guides</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.levels.index') }}">Levels</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.country.index') }}">Country</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.category.index') }}">Categories</a></li>
+                </ul>
+            </div>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.video.index') }}">

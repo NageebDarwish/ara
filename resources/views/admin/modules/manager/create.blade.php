@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-4">
+    <div class="mt-4">
         <div class="card">
             <div class="card-header ">
                 <h3 class="card-title">Add New Manager</h3>

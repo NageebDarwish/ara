@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Edit Series</h3>
@@ -22,42 +22,6 @@
                                     {{ $level->name }}
                                 </option>
                             @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Topic Selection -->
-                    <div class="form-group">
-                        <label for="topic_id">Topic</label>
-                        <select name="topic_id" id="topic_id" class="form-control">
-                            <option value="">Select Topic</option>
-                            @foreach ($topics as $topic)
-                                <option value="{{ $topic->id }}" {{ $series->topic_id == $topic->id ? 'selected' : '' }}>
-                                    {{ $topic->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Guide Selection -->
-                    <div class="form-group">
-                        <label for="guide_id">Guide</label>
-                        <select name="guide_id" id="guide_id" class="form-control">
-                            <option value="">Select Guide</option>
-                            @foreach ($guides as $guide)
-                                <option value="{{ $guide->id }}" {{ $series->guide_id == $guide->id ? 'selected' : '' }}>
-                                    {{ $guide->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="plan">Plan</label>
-                        <select name="plan" class="form-control">
-                            <option value="">Select Plan</option>
-                            <option value="new" {{ $series->plan === 'new' ? 'selected' : '' }}>New</option>
-                            <option value="free" {{ $series->plan === 'free' ? 'selected' : '' }}>Free</option>
-                            <option value="premium" {{ $series->plan === 'premium' ? 'selected' : '' }}>Premium</option>
                         </select>
                     </div>
 

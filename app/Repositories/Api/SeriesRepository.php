@@ -22,12 +22,9 @@ class SeriesRepository
 
     public function index()
     {
-        $query= $this->model->with('country','topic','videos.comments.user','videos.comments.likes');
+        $query= $this->model->with('country','videos.comments.user','videos.comments.likes');
         $query->where('status','public');
-        $query->whereIn('plan',['free','premium']);
         $query->whereNotNull('level_id');
-        $query->whereNotNull('guide_id');
-        $query->whereNotNull('topic_id');
 
         return $query->get();
     }
@@ -35,7 +32,7 @@ class SeriesRepository
     {
         return $this->model->findOrFail($id);
     }
-    
+
   public function addToWatched($id)
     {
         $video = SeriesVideo::findOrFail($id);
@@ -151,10 +148,7 @@ class SeriesRepository
             ])
             ->where('id', $id)
             ->where('status', 'public')
-            ->whereIn('plan', ['free', 'premium'])
             ->whereNotNull('level_id')
-            ->whereNotNull('guide_id')
-            ->whereNotNull('topic_id')
             ->firstOrFail();
     }
 }

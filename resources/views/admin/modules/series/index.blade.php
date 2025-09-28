@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
            <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Series List</h3>
@@ -15,11 +15,8 @@
                             <th>#</th>
                             <th>Title</th>
                             <th>Level</th>
-                            <th>Guide</th>
                             <!--<th>Description</th>-->
-                            <th>Topic</th>
                             <!-- <th>Status</th> -->
-                            <th>Plan</th>
                             <th>Publish Date</th>
                             <th>Actions</th>
                         </tr>
@@ -30,26 +27,12 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $s->title }}</td>
                                 <td>{{ $s->level?->name ?? 'N/A' }}</td>
-                                <td>{{ $s->guide?->name ?? 'N/A' }}</td>
                                 <!--<td>{{ $s->description }}</td>-->
-                                <td>{{ $s->topic->name ?? 'N/A' }}</td>
                                 <!-- <td>
-                                                            <span class="{{ $s->status == 'public' ? 'badge badge-success' : 'badge badge-secondary' }}">
-                                                                {{ $s->status ?? 'N/A' }}
-                                                            </span>
-                                                        </td> -->
-                                <td>
-                                    <span
-                                        class="{{ empty($s->plan)
-                                            ? 'badge badge-secondary'
-                                            : ($s->plan === 'free'
-                                                ? 'badge badge-success'
-                                                : ($s->plan === 'premium'
-                                                    ? 'badge badge-warning'
-                                                    : 'badge badge-danger')) }}">
-                                        {{ empty($s->plan) ? 'N/A' : ucfirst($s->plan) }}
+                                    <span class="{{ $s->status == 'public' ? 'badge badge-success' : 'badge badge-secondary' }}">
+                                        {{ $s->status ?? 'N/A' }}
                                     </span>
-                                </td>
+                                </td> -->
 
                                 <td>{{ \Carbon\Carbon::parse($s->scheduleDateTime ?? $s->publishedAt)->format('Y-m-d H:i:s') }}
                                 </td>

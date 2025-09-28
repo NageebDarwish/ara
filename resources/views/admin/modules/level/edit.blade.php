@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Edit Level</h3>
@@ -17,7 +17,7 @@
                         </ul>
                     </div>
                 @endif
-                
+
                 <form action="{{ route('admin.levels.update', $level->id) }}" method="POST">
                     @csrf
                     @method('PUT')

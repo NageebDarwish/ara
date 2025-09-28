@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container-fluid py-4">
+    <div class="py-4">
         <div class="row">
             <div class="col-12">
                 <div class="card my-4 shadow">
@@ -18,7 +18,7 @@
                         <div class="table-responsive p-0">
                             <table id="dataTable" class="table align-items-center mb-0">
                                 <thead>
-                                      
+
                                     <tr>
                                              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Category</th>

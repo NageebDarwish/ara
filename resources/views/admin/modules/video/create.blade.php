@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Create Video</h3>
@@ -21,7 +21,7 @@
                 <form action="{{ route('admin.video.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
-                    
+
                     <!-- Level Selection -->
                     <div class="form-group">
                         <label for="level_id">Level</label>

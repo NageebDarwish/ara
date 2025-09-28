@@ -1,6 +1,6 @@
 @extends('admin.layout.layout')
 @section('content')
-<div class="container mt-5">
+<div class="mt-5">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title ">Video List</h3>
@@ -40,37 +40,24 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Title</th>
+                                    <th>Published Date</th>
+                                    <th>Actions</th>
                                     <th>Level</th>
                                     <th>Topic</th>
                                     <th>Guide</th>
                                     <th>Plan</th>
-                                    <th>Title</th>
                                     <th>Video</th>
-                                    <th>Published Date</th>
                                     <th>Duration</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($data->where('plan', 'new') as $video)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
-                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
-                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
-                                    <td><span class="badge badge-info">New</span></td>
                                     <td>{{ Str::limit($video->title, 50) }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
-                                            data-video-url="{{ $video->video_url }}"
-                                            data-video-title="{{ $video->title }}"
-                                            data-target="#videoModal-{{ $video->id }}">
-                                            Watch Video
-                                        </button>
-                                    </td>
                                     <td>{{ \Carbon\Carbon::parse($video->scheduleDateTime ?? $video->publishedAt)->format('Y-m-d H:i:s') }}
                                     </td>
-                                     <td>{{ $video->duration ?? 'N/A' }}</td>
                                     <td>
                                         <a href="{{ route('admin.video.edit', $video->id) }}"
                                             class="btn btn-sm btn-warning">Edit</a>
@@ -84,6 +71,21 @@
                                         </form>
                                         @endif
                                     </td>
+                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
+                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
+                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
+                                    <td><span class="badge badge-info">New</span></td>
+
+                                    <td>
+                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
+                                            data-video-url="{{ $video->video_url }}"
+                                            data-video-title="{{ $video->title }}"
+                                            data-target="#videoModal-{{ $video->id }}">
+                                            Watch Video
+                                        </button>
+                                    </td>
+
+                                     <td>{{ $video->duration ?? 'N/A' }}</td>
                                 </tr>
                                 <!-- Modal for this video -->
                                 <div class="modal fade" id="videoModal-{{ $video->id }}" tabindex="-1" role="dialog"
@@ -127,33 +129,22 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Title</th>
+                                    <th>Published Date</th>
+                                    <th>Actions</th>
                                     <th>Level</th>
                                     <th>Topic</th>
                                     <th>Guide</th>
                                     <th>Plan</th>
-                                    <th>Title</th>
                                     <th>Video</th>
-                                    <th>Published Date</th>
-                                    <th>Actions</th>
+
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($data->where('plan', 'free') as $video)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
-                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
-                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
-                                    <td><span class="badge badge-warning">Free</span></td>
                                     <td>{{ Str::limit($video->title, 50) }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
-                                            data-video-url="{{ $video->video_url }}"
-                                            data-video-title="{{ $video->title }}"
-                                            data-target="#videoModal-{{ $video->id }}">
-                                            Watch Video
-                                        </button>
-                                    </td>
                                     <td>{{ \Carbon\Carbon::parse($video->scheduleDateTime ?? $video->publishedAt)->format('Y-m-d H:i:s') }}
                                     </td>
                                     <td>
@@ -167,6 +158,20 @@
                                                 onclick="return confirm('Are you sure you want to delete this video?')">Delete</button>
                                         </form>
                                     </td>
+                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
+                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
+                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
+                                    <td><span class="badge badge-warning">Free</span></td>
+
+                                    <td>
+                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
+                                            data-video-url="{{ $video->video_url }}"
+                                            data-video-title="{{ $video->title }}"
+                                            data-target="#videoModal-{{ $video->id }}">
+                                            Watch Video
+                                        </button>
+                                    </td>
+
                                 </tr>
                                 <!-- Modal for this video -->
                                 <div class="modal fade" id="videoModal-{{ $video->id }}" tabindex="-1" role="dialog"
@@ -210,33 +215,21 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Title</th>
+                                    <th>Published Date</th>
+                                    <th>Actions</th>
                                     <th>Level</th>
                                     <th>Topic</th>
                                     <th>Guide</th>
                                     <th>Plan</th>
-                                    <th>Title</th>
                                     <th>Video</th>
-                                    <th>Published Date</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($data->where('plan', 'premium') as $video)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
-                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
-                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
-                                    <td><span class="badge badge-success">Premium</span></td>
                                     <td>{{ Str::limit($video->title, 50) }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
-                                            data-video-url="{{ $video->video_url }}"
-                                            data-video-title="{{ $video->title }}"
-                                            data-target="#videoModal-{{ $video->id }}">
-                                            Watch Video
-                                        </button>
-                                    </td>
                                     <td>{{ \Carbon\Carbon::parse($video->scheduleDateTime ?? $video->publishedAt)->format('Y-m-d H:i:s') }}
                                     </td>
                                     <td>
@@ -250,6 +243,20 @@
                                                 onclick="return confirm('Are you sure you want to delete this video?')">Delete</button>
                                         </form>
                                     </td>
+                                    <td>{{ ucfirst($video->level?->name ?? 'N/A') }}</td>
+                                    <td>{{ $video->topic?->name ?? 'N/A' }}</td>
+                                    <td>{{ $video->guide?->name ?? 'N/A' }}</td>
+                                    <td><span class="badge badge-success">Premium</span></td>
+
+                                    <td>
+                                        <button class="btn btn-sm btn-primary open-video-modal" data-toggle="modal"
+                                            data-video-url="{{ $video->video_url }}"
+                                            data-video-title="{{ $video->title }}"
+                                            data-target="#videoModal-{{ $video->id }}">
+                                            Watch Video
+                                        </button>
+                                    </td>
+
                                 </tr>
                                 <!-- Modal for this video -->
                                 <div class="modal fade" id="videoModal-{{ $video->id }}" tabindex="-1" role="dialog"

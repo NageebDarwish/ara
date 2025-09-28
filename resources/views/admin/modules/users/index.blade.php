@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">User Management</h3>
@@ -116,7 +116,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
                     <!-- Permissions Tab -->
                     @if(auth()->user()->hasRole('super-admin'))
                     <div class="tab-pane fade" id="permissions" role="tabpanel">
@@ -148,7 +148,7 @@
                                                                         <input type="hidden" name="user_id" value="{{ $admin->id }}">
                                                                         <input type="hidden" name="permission" value="{{ $permission->name }}">
                                                                         <div class="custom-control custom-switch">
-                                                                            <input type="checkbox" class="custom-control-input permission-toggle" 
+                                                                            <input type="checkbox" class="custom-control-input permission-toggle"
                                                                                 id="permission_{{ $admin->id }}_{{ $permission->id }}"
                                                                                 {{ $admin->hasPermissionTo($permission->name) ? 'checked' : '' }}
                                                                                 onchange="this.form.submit()">

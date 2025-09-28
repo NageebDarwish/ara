@@ -16,7 +16,7 @@ class BlogRequest extends FormRequest
             'description'=>'required',
             'meta_description'=>'nullable',
             'content'=>'required',
-            'slug'=>'nullable|string|max:255|unique:blogs,slug|regex:/^[A-Za-z0-9_]+$/',
+            'slug' => 'nullable|string|max:255|unique:blogs,slug|regex:/^[A-Za-z0-9_-]+$/',
             'author'=>'required|string|max:255',
              'blog_category_id'=>'required',
         ];
