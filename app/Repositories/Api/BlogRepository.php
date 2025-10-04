@@ -19,7 +19,7 @@ class BlogRepository
           $latestIds = $this->model->orderBy('created_at', 'desc')
         ->take(3)
         ->pluck('id');
-    
+
         return $this->model->orderBy('created_at', 'desc')
             ->when($latestIds->isNotEmpty(), function($query) use ($latestIds) {
                 return $query->whereNotIn('id', $latestIds);
@@ -33,12 +33,17 @@ class BlogRepository
             ->take(3)
             ->get();
     }
-    
+
      public function find($id)
     {
         return $this->model->findOrFail($id);
     }
-    
+
+    public function findBySlug($slug)
+    {
+        return $this->model->where('slug', $slug)->firstOrFail();
+    }
+
     public function related($id)
     {
         $blog=$this->model->findOrFail($id);
@@ -48,14 +53,14 @@ class BlogRepository
             ->take(6)
             ->get();
     }
-    
-    
+
+
     public function categories()
     {
         return BlogCategory::all();
     }
 
- 
+
     public function categoryAll($ids)
     {
         $latestIds = $this->model->orderBy('created_at', 'desc')

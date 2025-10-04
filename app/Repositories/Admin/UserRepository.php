@@ -23,4 +23,17 @@ class UserRepository
     {
         return $this->model::find($id);
     }
+
+    public function getUsersForDataTable()
+    {
+        return $this->model::where('role', 'user')
+            ->with(['progressLevel'])
+            ->select(['id', 'name', 'email', 'is_premium', 'total_watching_hours', 'progress_level_id']);
+    }
+
+    public function getManagersForDataTable()
+    {
+        return $this->model::where('role', 'manager')
+            ->select(['id', 'name', 'email']);
+    }
 }

@@ -47,6 +47,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
 
     /* manager users */
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/data', [UserController::class, 'getUsersData'])->name('users.data');
     Route::delete('users/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
 
     Route::resource('blog', BlogController::class);

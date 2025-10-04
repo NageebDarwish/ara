@@ -26,16 +26,17 @@ class BlogController extends Controller
         });
 
     }
-    
-    public function show($id)
+
+    public function show($slug)
     {
-        return ExceptionHandlerHelper::tryCatch(function() use ($id){
-            $data['blog'] = $this->repository->find($id);
-            $data['related'] = $this->repository->related($id);
+        return ExceptionHandlerHelper::tryCatch(function() use ($slug){
+            $blog = $this->repository->findBySlug($slug);
+            $data['blog'] = $blog;
+            $data['related'] = $this->repository->related($blog->id);
             return $this->sendResponse($data,'Blog Details');
         });
     }
-    
+
     public function categories()
     {
         return ExceptionHandlerHelper::tryCatch(function() {

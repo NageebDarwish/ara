@@ -1,193 +1,204 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="mt-5">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">User Management</h3>
-            </div>
-            <div class="card-body">
-                <!-- Nav Tabs -->
-                <ul class="nav nav-tabs" id="userManagementTabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users" role="tab">Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="managers-tab" data-toggle="tab" href="#managers" role="tab">Managers</a>
-                    </li>
-                    @if(auth()->user()->hasRole('super-admin'))
-                    <li class="nav-item">
-                        <a class="nav-link" id="permissions-tab" data-toggle="tab" href="#permissions" role="tab">Permissions</a>
-                    </li>
-                    @endif
-                </ul>
+    @php
+        // Define columns for users table
+        $userColumns = [
+            [
+                'label' => '#',
+                'field' => 'id',
+                'type' => 'custom',
+                'render' => function ($item) use ($users) {
+                    $usersList = $users->where('role', 'user');
+                    $index = $usersList->search(function ($user) use ($item) {
+                        return $user->id === $item->id;
+                    });
+                    return $index !== false ? $index + 1 : 0;
+                },
+            ],
+            ['label' => 'Name', 'field' => 'name'],
+            ['label' => 'Email', 'field' => 'email'],
+            [
+                'label' => 'Premium',
+                'field' => 'is_premium',
+                'type' => 'boolean',
+                'true_text' => 'Yes',
+                'false_text' => 'No',
+            ],
+            ['label' => 'Progress Level', 'field' => 'progressLevel.name', 'type' => 'relation'],
+            [
+                'label' => 'Total Watching Hours',
+                'field' => 'total_watching_hours',
+                'type' => 'custom',
+                'render' => function ($item) {
+                    $totalSeconds = $item->total_watching_hours;
+                    $hours = floor($totalSeconds / 3600);
+                    $minutes = floor(($totalSeconds % 3600) / 60);
+                    $seconds = $totalSeconds % 60;
+                    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+                },
+            ],
+        ];
 
-                <!-- Tab Content -->
-                <div class="tab-content pt-3" id="userManagementTabsContent">
-                    <!-- Users Tab -->
-                    <div class="tab-pane fade show active" id="users" role="tabpanel">
-                        <div class="table-responsive">
-                            <table id="usersTable" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Premium</th>
-                                        <th>Progress Level</th>
-                                        <th>Total Watching Hours</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($users->where('role', 'user') as $user)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>{{ $user->is_premium == 1 ? 'Yes' : 'No' }}</td>
-                                            <td>{{ $user->progressLevel->name ?? 'N/A' }}</td>
-                                            <td>
-                                                @php
-                                                    $totalSeconds = $user->total_watching_hours;
-                                                    $hours = floor($totalSeconds / 3600);
-                                                    $minutes = floor(($totalSeconds % 3600) / 60);
-                                                    $seconds = $totalSeconds % 60;
-                                                @endphp
-                                                {{ sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds) }}
-                                            </td>
-                                            <td>
-                                                @if (auth()->user()->role == 'admin')
-                                                    <form action="{{ route('admin.users.delete', $user->id) }}"
-                                                        method="POST" style="display:inline-block;"
-                                                        onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                                    </form>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        // Define actions for users table
+        $userActions = [];
+        if (auth()->user()->role == 'admin') {
+            $userActions[] = [
+                'type' => 'form',
+                'route' => 'admin.users.delete',
+                'method' => 'DELETE',
+                'class' => 'btn-danger',
+                'label' => 'Delete',
+                'confirm' => 'Are you sure you want to delete this user?',
+            ];
+        }
 
-                    <!-- Managers Tab -->
-                    <div class="tab-pane fade" id="managers" role="tabpanel">
-                        <div class="mb-3">
-                            <a href="{{ route('admin.manager.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Manager
-                            </a>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="managersTable" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($users->where('role', 'manager') as $manager)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $manager->name }}</td>
-                                            <td>{{ $manager->email }}</td>
-                                            <td>
-                                                <a href="{{ route('admin.manager.edit', $manager->id) }}"
-                                                    class="btn btn-sm btn-warning mr-2">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <form action="{{ route('admin.manager.destroy', $manager->id) }}"
-                                                    method="POST" style="display:inline-block;"
-                                                    onsubmit="return confirm('Are you sure you want to delete this manager?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        // Define columns for managers table
+        $managerColumns = [
+            [
+                'label' => '#',
+                'field' => 'id',
+                'type' => 'custom',
+                'render' => function ($item) use ($users) {
+                    $managersList = $users->where('role', 'manager');
+                    $index = $managersList->search(function ($user) use ($item) {
+                        return $user->id === $item->id;
+                    });
+                    return $index !== false ? $index + 1 : 0;
+                },
+            ],
+            ['label' => 'Name', 'field' => 'name'],
+            ['label' => 'Email', 'field' => 'email'],
+        ];
 
-                    <!-- Permissions Tab -->
-                    @if(auth()->user()->hasRole('super-admin'))
-                    <div class="tab-pane fade" id="permissions" role="tabpanel">
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Manage Admin Permissions</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Admin</th>
-                                                        @foreach(\Spatie\Permission\Models\Permission::all() as $permission)
-                                                            <th>{{ ucwords(str_replace('_', ' ', $permission->name)) }}</th>
-                                                        @endforeach
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($users->where('role', 'manager') as $admin)
-                                                        <tr>
-                                                            <td>{{ $admin->name }}</td>
-                                                            @foreach(\Spatie\Permission\Models\Permission::all() as $permission)
-                                                                <td>
-                                                                    <form action="{{ route('admin.permissions.toggle') }}" method="POST">
-                                                                        @csrf
-                                                                        <input type="hidden" name="user_id" value="{{ $admin->id }}">
-                                                                        <input type="hidden" name="permission" value="{{ $permission->name }}">
-                                                                        <div class="custom-control custom-switch">
-                                                                            <input type="checkbox" class="custom-control-input permission-toggle"
-                                                                                id="permission_{{ $admin->id }}_{{ $permission->id }}"
-                                                                                {{ $admin->hasPermissionTo($permission->name) ? 'checked' : '' }}
-                                                                                onchange="this.form.submit()">
-                                                                            <label class="custom-control-label" for="permission_{{ $admin->id }}_{{ $permission->id }}"></label>
-                                                                        </div>
-                                                                    </form>
-                                                                </td>
-                                                            @endforeach
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
+        // Define actions for managers table
+        $managerActions = [
+            [
+                'type' => 'link',
+                'route' => 'admin.manager.edit',
+                'class' => 'btn-warning',
+                'label' => 'Edit',
+                'icon' => 'fas fa-edit',
+                'spacing' => 'me-2',
+            ],
+            [
+                'type' => 'form',
+                'route' => 'admin.manager.destroy',
+                'method' => 'DELETE',
+                'class' => 'btn-danger',
+                'label' => 'Delete',
+                'confirm' => 'Are you sure you want to delete this manager?',
+            ],
+        ];
 
+        // Define tabs data
+        $tabs = [
+            'users' => [
+                'title' => 'Users',
+                'data' => $users->where('role', 'user'),
+                'columns' => [
+                    ['key' => 'DT_RowIndex', 'label' => '#', 'sortable' => false, 'searchable' => false],
+                    ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
+                    ['key' => 'email', 'label' => 'Email', 'sortable' => true, 'searchable' => true],
+                    ['key' => 'is_premium', 'label' => 'Premium', 'sortable' => true, 'searchable' => false],
+                    ['key' => 'progress_level', 'label' => 'Progress Level', 'sortable' => true, 'searchable' => false],
+                    [
+                        'key' => 'total_watching_hours',
+                        'label' => 'Total Watching Hours',
+                        'sortable' => true,
+                        'searchable' => false,
+                    ],
+                    ['key' => 'actions', 'label' => 'Actions', 'sortable' => false, 'searchable' => false],
+                ],
+                'actions' => $userActions,
+                'ajaxUrl' => route('admin.users.data'),
+            ],
+            'managers' => [
+                'title' => 'Managers',
+                'data' => $users->where('role', 'manager'),
+                'columns' => [
+                    ['key' => 'DT_RowIndex', 'label' => '#', 'sortable' => false, 'searchable' => false],
+                    ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
+                    ['key' => 'email', 'label' => 'Email', 'sortable' => true, 'searchable' => true],
+                    ['key' => 'actions', 'label' => 'Actions', 'sortable' => false, 'searchable' => false],
+                ],
+                'actions' => $managerActions,
+                'ajaxUrl' => route('admin.users.data'),
+            ],
+        ];
+
+        if (auth()->user()->hasRole('super-admin')) {
+            // Define columns for permissions table
+            $permissionColumns = [['label' => 'Admin', 'key' => 'name']];
+
+            // Add permission columns dynamically
+            foreach (\Spatie\Permission\Models\Permission::all() as $permission) {
+                $permissionColumns[] = [
+                    'label' => ucwords(str_replace('_', ' ', $permission->name)),
+                    'key' => 'permission_' . $permission->id,
+                    'type' => 'custom',
+                    'render' => function ($admin) use ($permission) {
+                        return '
+                             <form action="' .
+                            route('admin.permissions.toggle') .
+                            '" method="POST" style="display:inline;">
+                                 ' .
+                            csrf_field() .
+                            '
+                                 <input type="hidden" name="user_id" value="' .
+                            $admin->id .
+                            '">
+                                 <input type="hidden" name="permission" value="' .
+                            $permission->name .
+                            '">
+                                 <div class="custom-control custom-switch">
+                                     <input type="checkbox" class="custom-control-input permission-toggle"
+                                         id="permission_' .
+                            $admin->id .
+                            '_' .
+                            $permission->id .
+                            '"
+                                         ' .
+                            ($admin->hasPermissionTo($permission->name) ? 'checked' : '') .
+                            '
+                                         onchange="this.form.submit()">
+                                     <label class="custom-control-label" for="permission_' .
+                            $admin->id .
+                            '_' .
+                            $permission->id .
+                            '"></label>
+                                 </div>
+                             </form>
+                         ';
+                    },
+                ];
+            }
+
+            $tabs['permissions'] = [
+                'title' => 'Permissions',
+                'data' => $users->where('role', 'manager'),
+                'columns' => $permissionColumns,
+                'actions' => [],
+            ];
+        }
+    @endphp
+
+    <x-dynamic-table title="User Management" :tabs="$tabs" tableId="userManagementTable" :showCreateButton="false"
+        cardClass="card mt-5" :enableAjaxPagination="true" />
+
+    <!-- Add Manager Button for Managers Tab -->
     <script>
         $(document).ready(function() {
-            $('#usersTable').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                responsive: true
-            });
-
-            $('#managersTable').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                responsive: true
-            });
+            // Add create button to managers tab
+            const managersTabPane = $('#managers');
+            const createButton = `
+                <div class="mb-3">
+                    <a href="{{ route('admin.manager.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Manager
+                    </a>
+                </div>
+            `;
+            managersTabPane.prepend(createButton);
         });
     </script>
 

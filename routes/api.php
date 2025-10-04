@@ -47,7 +47,7 @@ Route::controller(FilterController::class)->group(function () {
 });
 
 Route::get('blogs', [BlogController::class, 'index']);
-Route::get('get/blog/{id}', [BlogController::class, 'show']);
+Route::get('get/blog/{slug}', [BlogController::class, 'show']);
 Route::get('blog/categories', [BlogController::class, 'categories']);
 Route::post('get/category/blogs', [BlogController::class, 'categoryBlogs']);
 Route::middleware(['auth:sanctum'])->group(function () {
