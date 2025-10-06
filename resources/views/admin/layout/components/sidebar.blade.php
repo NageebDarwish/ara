@@ -77,13 +77,13 @@
         </li>
         @endif
 
-        {{-- <li class="nav-item sidebar-user-actions">
+        <li class="nav-item sidebar-user-actions">
             <div class="sidebar-user-menu">
-                <a href="#" class="nav-link"><i class="mdi mdi-settings menu-icon"></i>
-                    <span class="menu-title">Settings</span>
+                <a href="{{ route('admin.profile.index') }}" class="nav-link"><i class="mdi mdi-account menu-icon"></i>
+                    <span class="menu-title">My Profile</span>
                 </a>
             </div>
-        </li> --}}
+        </li>
 
         <li class="nav-item sidebar-user-actions">
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\NewsLetterController;
 use App\Http\Controllers\Admin\ManagerController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\ProfileController;
 
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
@@ -28,6 +29,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')->group(function () {
 
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+
+    // Profile routes
+    Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('profile/password', [ProfileController::class, 'editPassword'])->name('profile.password');
+    Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     Route::resource('manager', ManagerController::class);
 
     // Topics routes

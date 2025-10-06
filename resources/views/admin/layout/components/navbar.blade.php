@@ -17,7 +17,11 @@
                 <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown"
                     aria-expanded="false">
                     <div class="nav-profile-img">
-                        <img src="{{ asset('assets/images/faces/face28.png') }}" alt="image">
+                        @if(Auth::user()->profile_image)
+                            <img src="{{ asset(Auth::user()->profile_image) }}" alt="Profile Image">
+                        @else
+                            <img src="{{ asset('assets/images/faces/face28.png') }}" alt="Default Profile">
+                        @endif
                     </div>
                     <div class="nav-profile-text">
                         <p class="mb-1 text-black">{{ Auth::user()->name }}</p>
@@ -26,40 +30,40 @@
                 <div class="dropdown-menu navbar-dropdown dropdown-menu-right p-0 border-0 font-size-sm"
                     aria-labelledby="profileDropdown" data-x-placement="bottom-end">
                     <div class="p-3 text-center bg-primary">
-                        <img class="img-avatar img-avatar48 img-avatar-thumb"
-                            src="{{ asset('assets/images/faces/face28.png') }}" alt="">
+                        @if(Auth::user()->profile_image)
+                            <img class="img-avatar img-avatar48 img-avatar-thumb"
+                                src="{{ asset(Auth::user()->profile_image) }}" alt="Profile Image">
+                        @else
+                            <img class="img-avatar img-avatar48 img-avatar-thumb"
+                                src="{{ asset('assets/images/faces/face28.png') }}" alt="Default Profile">
+                        @endif
                     </div>
                     <div class="p-2">
                         <h5 class="dropdown-header text-uppercase pl-2 text-dark">User Options</h5>
-                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                            <span>Inbox</span>
-                            <span class="p-0">
-                                <span class="badge badge-primary">3</span>
-                                <i class="mdi mdi-email-open-outline ml-1"></i>
-                            </span>
+                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="{{ route('admin.profile.index') }}">
+                            <span>My Profile</span>
+                            <i class="mdi mdi-account-outline ml-1"></i>
                         </a>
-                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                            <span>Profile</span>
-                            <span class="p-0">
-                                <span class="badge badge-success">1</span>
-                                <i class="mdi mdi-account-outline ml-1"></i>
-                            </span>
+                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="{{ route('admin.profile.edit') }}">
+                            <span>Edit Profile</span>
+                            <i class="mdi mdi-pencil ml-1"></i>
                         </a>
                         <a class="dropdown-item py-1 d-flex align-items-center justify-content-between"
-                            href="javascript:void(0)">
-                            <span>Settings</span>
-                            <i class="mdi mdi-settings"></i>
+                            href="{{ route('admin.profile.password') }}">
+                            <span>Change Password</span>
+                            <i class="mdi mdi-lock ml-1"></i>
                         </a>
                         <div role="separator" class="dropdown-divider"></div>
                         <h5 class="dropdown-header text-uppercase  pl-2 text-dark mt-2">Actions</h5>
-                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
-                            <span>Lock Account</span>
-                            <i class="mdi mdi-lock ml-1"></i>
-                        </a>
-                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="#">
+                        <a class="dropdown-item py-1 d-flex align-items-center justify-content-between"
+                            href="#"
+                            onclick="event.preventDefault(); document.getElementById('logout-form-navbar').submit();">
                             <span>Log Out</span>
                             <i class="mdi mdi-logout ml-1"></i>
                         </a>
+                        <form id="logout-form-navbar" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
                 </div>
             </li>
