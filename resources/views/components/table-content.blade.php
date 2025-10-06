@@ -8,8 +8,13 @@
     'enableDataTable' => true
 ])
 
-<div class="table-responsive p-0">
-    <table id="{{ $tableId }}" class="{{ $tableClass }}">
+<div id="{{ $tableId }}-wrapper" class="table-responsive p-0 position-relative">
+    <!-- Loading Overlay -->
+    <div id="{{ $tableId }}-overlay" class="data-overlay d-none" style="position:absolute; inset:0; background:rgba(255,255,255,0.7); z-index: 10; display:flex; align-items:center; justify-content:center;">
+        <div class="spinner-border text-primary" role="status" aria-label="Loading">
+        </div>
+    </div>
+    <table id="{{ $tableId }}" class="{{ $tableClass }} w-100">
         <thead>
             <tr>
                 @foreach($columns as $column)
@@ -52,13 +57,13 @@
                             @endif
                         </td>
                     @endforeach
-                    
+
                     @if(!empty($actions))
                         <td>
                             <div class="d-flex align-items-center">
                                 @foreach($actions as $action)
                                     @if($action['type'] === 'link')
-                                        <a href="{{ route($action['route'], $item->id) }}" 
+                                        <a href="{{ route($action['route'], $item->id) }}"
                                            class="btn btn-sm {{ $action['class'] ?? 'btn-primary' }} {{ $action['spacing'] ?? 'me-2' }}"
                                            @if(isset($action['tooltip'])) data-toggle="tooltip" title="{{ $action['tooltip'] }}" @endif>
                                             @if(isset($action['icon']))
@@ -67,15 +72,15 @@
                                             {{ $action['label'] ?? '' }}
                                         </a>
                                     @elseif($action['type'] === 'form')
-                                        <form action="{{ route($action['route'], $item->id) }}" 
-                                              method="POST" 
+                                        <form action="{{ route($action['route'], $item->id) }}"
+                                              method="POST"
                                               style="display:inline-block;"
                                               @if(isset($action['confirm'])) onsubmit="return confirm('{{ $action['confirm'] }}')" @endif>
                                             @csrf
                                             @if(isset($action['method']))
                                                 @method($action['method'])
                                             @endif
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="btn btn-sm {{ $action['class'] ?? 'btn-danger' }}"
                                                     @if(isset($action['tooltip'])) data-toggle="tooltip" title="{{ $action['tooltip'] }}" @endif>
                                                 @if(isset($action['icon']))

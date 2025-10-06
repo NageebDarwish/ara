@@ -19,6 +19,13 @@ class BlogRepository
         return $this->model->orderBy('created_at','desc')->get();
     }
 
+    public function getBlogsForDataTable()
+    {
+        return $this->model->with(['category'])
+            ->select(['id', 'blog_category_id', 'author', 'title', 'meta_title', 'slug', 'cover_image', 'created_at'])
+            ->orderBy('created_at', 'desc');
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

@@ -19,6 +19,11 @@ class LevelRepository
         return $this->model->all();
     }
 
+    public function getLevelsForDataTable()
+    {
+        return $this->model->select(['id', 'name'])->orderBy('created_at', 'desc');
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

@@ -19,6 +19,11 @@ class PageRepository
         return $this->model->all();
     }
 
+    public function getPagesForDataTable()
+    {
+        return $this->model->select(['id', 'name', 'slug', 'title', 'description'])->orderBy('created_at', 'desc');
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

@@ -110,9 +110,8 @@
                                         <form action="{{ route('admin.contactus.destroy', $message->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-dark"
-                                                onclick="return confirm('Delete this message?')">
-                                                Delete
+                                            <button type="submit" class="btn btn-sm btn-danger delete-btn" title="Delete Message">
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
                                     </div>

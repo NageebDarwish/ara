@@ -19,6 +19,11 @@ class CountryRepository
         return $this->model->all();
     }
 
+    public function getCountriesForDataTable()
+    {
+        return $this->model->select(['id', 'name'])->orderBy('created_at', 'desc');
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

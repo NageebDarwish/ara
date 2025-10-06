@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\{Topic, Guide, Level, Video};
 use App\Models\Country;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class VideoController extends Controller
 {
@@ -21,17 +22,56 @@ class VideoController extends Controller
 
     public function index()
     {
-        $data = $this->repository->all();
-        return view('admin.modules.video.index', compact('data'));
+        return view('admin.modules.video.index');
+    }
+
+    public function getVideosData(Request $request)
+    {
+        $plan = $request->get('plan');
+        $videos = $this->repository->getVideosForDataTable($plan);
+
+        return \Yajra\DataTables\Facades\DataTables::of($videos)
+            ->addIndexColumn()
+            ->addColumn('publishedDate', function ($video) {
+                return \Carbon\Carbon::parse($video->scheduleDateTime ?? $video->publishedAt)->format('Y-m-d H:i:s');
+            })
+            ->addColumn('level', function ($video) {
+                return ucfirst($video->level?->name ?? 'N/A');
+            })
+            ->addColumn('topic', function ($video) {
+                return $video->topic?->name ?? 'N/A';
+            })
+            ->addColumn('guide', function ($video) {
+                return $video->guide?->name ?? 'N/A';
+            })
+            ->addColumn('plan_badge', function ($video) {
+                $badges = [
+                    'new' => '<span class="badge badge-info">New</span>',
+                    'free' => '<span class="badge badge-warning">Free</span>',
+                    'premium' => '<span class="badge badge-success">Premium</span>',
+                ];
+                return $badges[$video->plan] ?? '<span class="badge badge-secondary">' . ucfirst($video->plan) . '</span>';
+            })
+            ->addColumn('video_link', function ($video) {
+                return '<button class="btn btn-sm btn-primary" onclick="openVideoModal(\'' . $video->video . '\', \'' . addslashes($video->title) . '\')">Watch Video</button>';
+            })
+            ->addColumn('actions', function ($video) {
+                $actions = '<a href="' . route('admin.video.edit', $video->id) . '" class="btn btn-sm btn-warning me-2" title="Edit Video"><i class="fa fa-edit"></i></a>';
+                if (Auth::check() && Auth::user()->role === 'admin') {
+                    $actions .= '<form action="' . route('admin.video.destroy', $video->id) . '" method="POST" style="display:inline-block;">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-sm btn-danger delete-btn" title="Delete Video"><i class="fa fa-trash"></i></button>
+                    </form>';
+                }
+                return $actions;
+            })
+            ->rawColumns(['plan_badge', 'video_link', 'actions'])
+            ->make(true);
     }
 
     public function create()
     {
-        if (!$this->repository->googleClient->getAccessToken()) {
-            $authUrl = $this->repository->getAuthUrl();
-            return redirect()->away($authUrl);
-        }
-
         $topics = Topic::all();
         $guides = Guide::all();
         $levels = Level::all();
@@ -43,18 +83,10 @@ class VideoController extends Controller
     {
         $data = $request->validated();
         try {
-            $videoId = $this->repository->uploadVideoToYouTube(
-                $request->file('video'),
-                $data['title'],
-                $data['description'],
-            );
-            $data['video'] = $videoId;
-            $this->repository->create($data);
-
-            return redirect()->route('admin.video.index')->with('success', 'Video uploaded and created successfully.');
+            $this->repository->create([$data]);
+            return redirect()->route('admin.video.index')->with('success', 'Video created successfully.');
         } catch (Exception $e) {
-            dd($e->getMessage());
-            return redirect()->route('admin.video.index')->with('error', 'Failed to upload video: ' . $e->getMessage());
+            return redirect()->route('admin.video.index')->with('error', 'Failed to create video: ' . $e->getMessage());
         }
     }
 
@@ -92,14 +124,10 @@ class VideoController extends Controller
 
     public function destroy($id)
     {
-        $this->repository->delete($id);
+        $video = $this->repository->find($id);
+        $video->delete();
 
         return redirect()->route('admin.video.index')->with('success', 'Deleted successfully.');
-    }
-
-    public function googleAuth()
-    {
-        return redirect($this->repository->getAuthUrl());
     }
 
     public function googleCallback(Request $request)

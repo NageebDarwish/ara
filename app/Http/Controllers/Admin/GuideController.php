@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\GuideRequest;
 use App\Repositories\Admin\GuideRepository;
+use Yajra\DataTables\Facades\DataTables;
 
 class GuideController extends Controller
 {
@@ -18,9 +19,26 @@ class GuideController extends Controller
 
     public function index()
     {
-        $data = $this->repository->all();
+        return view('admin.modules.guide.index');
+    }
 
-        return view('admin.modules.guide.index', compact('data'));
+    public function getGuidesData(Request $request)
+    {
+        $guides = $this->repository->getGuidesForDataTable();
+
+        return DataTables::of($guides)
+            ->addIndexColumn()
+            ->addColumn('actions', function ($guide) {
+                $actions = '<a href="' . route('admin.guides.edit', $guide->id) . '" class="btn btn-warning btn-sm me-2" title="Edit Guide"><i class="fa fa-edit"></i></a>';
+                $actions .= '<form method="POST" action="' . route('admin.guides.destroy', $guide->id) . '" style="display:inline;" title="Delete Guide">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-danger btn-sm delete-btn"><i class="fa fa-trash"></i></button>
+                </form>';
+                return $actions;
+            })
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     public function create()

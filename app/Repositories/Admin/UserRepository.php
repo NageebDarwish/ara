@@ -14,9 +14,10 @@ class UserRepository
         $this->model = $model;
     }
 
-    public function index()
+    public function index($perPage = null)
     {
-        return $this->model::whereIn('role', ['user', 'manager'])->get();
+        $query = $this->model::whereIn('role', ['user', 'manager']);
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
 
     public function findOrFail($id)

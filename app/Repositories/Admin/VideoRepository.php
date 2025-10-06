@@ -185,6 +185,19 @@ class VideoRepository
         return $this->model->orderBy('created_at', 'desc')->get();
     }
 
+    public function getVideosForDataTable($plan = null)
+    {
+        $query = $this->model->with(['level', 'topic', 'guide'])
+            ->select(['id', 'title', 'publishedAt', 'scheduleDateTime', 'plan', 'level_id', 'topic_id', 'guide_id', 'video', 'duration'])
+            ->orderBy('created_at', 'desc');
+
+        if ($plan) {
+            $query->where('plan', $plan);
+        }
+
+        return $query;
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

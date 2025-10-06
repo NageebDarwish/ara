@@ -18,6 +18,11 @@ class CategoryRepository
         return $this->model->orderBy('created_at', 'desc')->get();
     }
 
+    public function getCategoriesForDataTable()
+    {
+        return $this->model->select(['id', 'name'])->orderBy('created_at', 'desc');
+    }
+
     public function find($id)
     {
         return $this->model->findOrFail($id);

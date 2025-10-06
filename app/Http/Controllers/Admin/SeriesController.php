@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\{Topic, Guide, Level, SeriesVideo};
 use App\Models\Country;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class SeriesController extends Controller
 {
@@ -21,18 +22,41 @@ class SeriesController extends Controller
 
   public function index()
     {
+        return view('admin.modules.series.index');
+    }
 
-        $data = $this->repository->all();
-        return view('admin.modules.series.index', compact('data'));
+    public function getSeriesData(Request $request)
+    {
+        $series = $this->repository->getSeriesForDataTable();
+
+        return \Yajra\DataTables\Facades\DataTables::of($series)
+            ->addIndexColumn()
+            ->addColumn('level', function ($s) {
+                return $s->level?->name ?? 'N/A';
+            })
+            ->addColumn('publishDate', function ($s) {
+                return \Carbon\Carbon::parse($s->scheduleDateTime ?? $s->publishedAt)->format('Y-m-d H:i:s');
+            })
+            ->addColumn('actions', function ($s) {
+                $actions = '<div class="d-flex align-items-center gap-2" style="gap: 0.5rem;">';
+                $actions .= '<a href="' . route('admin.series.edit', $s->id) . '" class="btn btn-warning btn-sm" title="Edit Series"><i class="fa fa-edit"></i></a>';
+                if (Auth::check() && Auth::user()->role === 'admin') {
+                    $actions .= '<form action="' . route('admin.series.destroy', $s->id) . '" method="POST" style="display:inline-block;">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-danger btn-sm delete-btn" title="Delete Series"><i class="fa fa-trash"></i></button>
+                    </form>';
+                }
+                $actions .= '<button class="btn btn-info btn-sm view-videos-btn" data-series-id="' . $s->id . '" data-series-title="' . htmlspecialchars($s->title) . '" title="View Videos"><i class="fa fa-play-circle"></i></button>';
+                $actions .= '</div>';
+                return $actions;
+            })
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     public function create()
     {
-        if (!$this->repository->googleClient->getAccessToken()) {
-            $authUrl = $this->repository->getAuthUrl();
-            return redirect()->away($authUrl);
-        }
-
         $countries = Country::all();
         $levels = Level::all();
         return view('admin.modules.series.create',compact('countries', 'levels'));
@@ -40,44 +64,15 @@ class SeriesController extends Controller
 
    public function store(SeriesRequest $request)
     {
-        // dd($request->all());
-        // Validate the request data
         $seriesData = $request->only(['level_id', 'country_id', 'title', 'description']);
-        $videoTitles = $request->input('video_title');
-        $videoDescriptions = $request->input('video_description');
-        $videos = $request->file('videos');
-
         $videosData = [];
 
-        // try {
-
-
-
-            // Loop through each video entry
-            foreach ($videos as $index => $videoFile) {
-
-                $videoId = $this->repository->uploadVideoToYouTube(
-                    $videoFile,
-                    $videoTitles[$index],
-                    $videoDescriptions[$index],
-                );
-
-
-                $videosData[] = [
-                    'video' => $videoId,
-                    'title' => $videoTitles[$index],
-                    'description' => $videoDescriptions[$index],
-                ];
-                sleep(2);
-            }
-
-            // Create the series and associate the videos in one step
+        try {
             $this->repository->create($seriesData, $videosData);
-
             return redirect()->route('admin.series.index')->with('success', 'Created successfully.');
-        // } catch (\Exception $e) {
-        //     return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
-        // }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)

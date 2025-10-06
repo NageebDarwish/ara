@@ -149,7 +149,7 @@ class SeriesRepository
         // Step 2: Fetch all items (videos) for each playlist
         $playlistItems = [];
         $allVideoIds = []; // To collect all video IDs for batch request
-        
+
         foreach ($playlists as $playlist) {
             $playlistId = $playlist['playlistId'];
             $videos = [];
@@ -168,7 +168,7 @@ class SeriesRepository
                 foreach ($playlistItemsResponse['items'] as $item) {
                     $videoId = $item['contentDetails']['videoId'];
                     $allVideoIds[] = $videoId;
-                    
+
                     $videos[] = [
                         'videoId' => $videoId,
                         'title' => $item['snippet']['title'],
@@ -193,15 +193,15 @@ class SeriesRepository
         // Step 3: Get video durations in batch (50 at a time)
         $videoDurations = [];
         $chunkedVideoIds = array_chunk($allVideoIds, 50); // YouTube allows max 50 IDs per request
-        
+
         foreach ($chunkedVideoIds as $videoIdsChunk) {
             $videosResponse = $this->youtube->videos->listVideos(
                 'contentDetails',
                 ['id' => implode(',', $videoIdsChunk)]
             );
-            
+
             foreach ($videosResponse['items'] as $video) {
-              
+
                 $videoDurations[$video['id']] = [
                     'duration' => $this->convertYouTubeDuration($video['contentDetails']['duration']),
                     'duration_seconds' => $this->convertYouTubeDurationToSeconds($video['contentDetails']['duration'])
@@ -212,9 +212,9 @@ class SeriesRepository
         // Step 4: Merge duration information back into playlist items
         foreach ($playlistItems as &$playlistItem) {
             foreach ($playlistItem['videos'] as &$video) {
-                 
+
                 if (isset($videoDurations[$video['videoId']])) {
-                    
+
                     $video['duration'] = $videoDurations[$video['videoId']]['duration'];
                     $video['duration_seconds'] = $videoDurations[$video['videoId']]['duration_seconds'];
                 }
@@ -237,6 +237,13 @@ class SeriesRepository
    public function all()
     {
         return $this->model->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getSeriesForDataTable()
+    {
+        return $this->model->with(['level'])
+            ->select(['id', 'title', 'level_id', 'publishedAt', 'scheduleDateTime'])
+            ->orderBy('created_at', 'desc');
     }
 
     public function find($id)
@@ -263,7 +270,7 @@ public function create($playlistItems)
 
             // Update or create videos in the playlist
             foreach ($data['videos'] as $video) {
-               
+
                 SeriesVideo::updateOrCreate(
                     [
                         'video'       => $video['videoId'],

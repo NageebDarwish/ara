@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryRequest;
 use App\Repositories\Admin\CategoryRepository;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
@@ -18,9 +19,26 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $data = $this->repository->all();
+        return view('admin.modules.category.index');
+    }
 
-        return view('admin.modules.category.index', compact('data'));
+    public function getCategoriesData(Request $request)
+    {
+        $categories = $this->repository->getCategoriesForDataTable();
+
+        return DataTables::of($categories)
+            ->addIndexColumn()
+            ->addColumn('actions', function ($category) {
+                $actions = '<a href="' . route('admin.category.edit', $category->id) . '" class="btn btn-warning btn-sm me-2" title="Edit Category"><i class="fa fa-edit"></i></a>';
+                $actions .= '<form method="POST" action="' . route('admin.category.destroy', $category->id) . '" style="display:inline;" title="Delete Category">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-danger btn-sm delete-btn"><i class="fa fa-trash"></i></button>
+                </form>';
+                return $actions;
+            })
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     public function create()

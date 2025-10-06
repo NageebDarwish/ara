@@ -95,7 +95,8 @@
         $tabs = [
             'users' => [
                 'title' => 'Users',
-                'data' => $users->where('role', 'user'),
+                // Using server-side AJAX, keep initial data empty to avoid column mismatch
+                'data' => collect([]),
                 'columns' => [
                     ['key' => 'DT_RowIndex', 'label' => '#', 'sortable' => false, 'searchable' => false],
                     ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
@@ -110,20 +111,21 @@
                     ],
                     ['key' => 'actions', 'label' => 'Actions', 'sortable' => false, 'searchable' => false],
                 ],
-                'actions' => $userActions,
-                'ajaxUrl' => route('admin.users.data'),
+                // Actions are rendered by DataTables server-side; omit blade actions to prevent extra column
+                'actions' => [],
+                'ajaxUrl' => route('admin.users.data', ['tab' => 'users']),
             ],
             'managers' => [
                 'title' => 'Managers',
-                'data' => $users->where('role', 'manager'),
+                'data' => collect([]),
                 'columns' => [
                     ['key' => 'DT_RowIndex', 'label' => '#', 'sortable' => false, 'searchable' => false],
                     ['key' => 'name', 'label' => 'Name', 'sortable' => true, 'searchable' => true],
                     ['key' => 'email', 'label' => 'Email', 'sortable' => true, 'searchable' => true],
                     ['key' => 'actions', 'label' => 'Actions', 'sortable' => false, 'searchable' => false],
                 ],
-                'actions' => $managerActions,
-                'ajaxUrl' => route('admin.users.data'),
+                'actions' => [],
+                'ajaxUrl' => route('admin.users.data', ['tab' => 'managers']),
             ],
         ];
 

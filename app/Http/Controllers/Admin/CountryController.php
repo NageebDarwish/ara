@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CountryRequest;
 use App\Repositories\Admin\CountryRepository;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class CountryController extends Controller
 {
@@ -18,9 +19,26 @@ class CountryController extends Controller
 
     public function index()
     {
-        $data = $this->repository->all();
+        return view('admin.modules.country.index');
+    }
 
-        return view('admin.modules.country.index', compact('data'));
+    public function getCountriesData(Request $request)
+    {
+        $countries = $this->repository->getCountriesForDataTable();
+
+        return DataTables::of($countries)
+            ->addIndexColumn()
+            ->addColumn('actions', function ($country) {
+                $actions = '<a href="' . route('admin.country.edit', $country->id) . '" class="btn btn-warning btn-sm me-2" title="Edit Country"><i class="fa fa-edit"></i></a>';
+                $actions .= '<form method="POST" action="' . route('admin.country.destroy', $country->id) . '" style="display:inline;" title="Delete Country">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-danger btn-sm delete-btn"><i class="fa fa-trash"></i></button>
+                </form>';
+                return $actions;
+            })
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     public function create()

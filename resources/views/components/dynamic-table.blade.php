@@ -9,7 +9,7 @@
     'emptyMessage' => 'No data found',
     'showCreateButton' => true,
     'cardClass' => 'card my-4 shadow',
-    'tableClass' => 'table align-items-center mb-0',
+    'tableClass' => 'table table-striped align-items-center mb-0',
     'enableDataTable' => true,
     'tabs' => null,
     'ajaxUrl' => null,
@@ -85,11 +85,42 @@
     <script>
         $(document).ready(function() {
             @if($tabs)
+                // Persist and restore active tab per table instance
+                (function() {
+                    var tabsId = '#{{ $tableId }}Tabs';
+                    var contentId = '#{{ $tableId }}TabsContent';
+                    var storageKey = '{{ $tableId }}_active_tab';
+                    var savedTab = localStorage.getItem(storageKey);
+
+                    if (savedTab && $(tabsId + ' a[href="#' + savedTab + '"]').length) {
+                        $(tabsId + ' a[href="#' + savedTab + '"]').tab('show');
+                    }
+
+                    $(tabsId + ' a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        var targetId = $(e.target).attr('href'); // like #users
+                        if (targetId) {
+                            localStorage.setItem(storageKey, targetId.substring(1));
+                        }
+                    });
+                })();
                 @foreach($tabs as $key => $tab)
                     @if($enableAjaxPagination && isset($tab['ajaxUrl']))
-                        $('#{{ $tableId }}-{{ $key }}').DataTable({
-                            processing: true,
+                        const tableEl{{ $key }} = $('#{{ $tableId }}-{{ $key }}');
+                        const overlayEl{{ $key }} = $('#{{ $tableId }}-{{ $key }}-overlay');
+                        const stateKey{{ $key }} = '{{ $tableId }}_{{ $key }}_state';
+                        const dt{{ $key }} = tableEl{{ $key }}.DataTable({
+                            processing: false,
                             serverSide: true,
+                            autoWidth: false,
+                            stateSave: true,
+                            stateDuration: 60 * 60 * 24, // 24 hours
+                            stateLoadCallback: function (settings) {
+                                var state = localStorage.getItem(stateKey{{ $key }});
+                                return state ? JSON.parse(state) : null;
+                            },
+                            stateSaveCallback: function (settings, data) {
+                                localStorage.setItem(stateKey{{ $key }}, JSON.stringify(data));
+                            },
                             ajax: {
                                 url: '{{ $tab['ajaxUrl'] }}',
                                 type: 'GET',
@@ -112,7 +143,25 @@
                             ordering: true,
                             responsive: true,
                             pageLength: 10,
-                            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+                            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                            preDrawCallback: function() { overlayEl{{ $key }}.removeClass('d-none'); },
+                            drawCallback: function() {
+                                overlayEl{{ $key }}.addClass('d-none');
+                                dt{{ $key }}.columns.adjust();
+                            }
+                        });
+                        // Custom debounce for global search
+                        var searchTimer{{ $key }} = null;
+                        $('#{{ $tableId }}-{{ $key }}_filter input').off('keyup.DT input.DT').on('keyup input', function(e) {
+                            var searchValue = this.value;
+                            clearTimeout(searchTimer{{ $key }});
+                            searchTimer{{ $key }} = setTimeout(function() {
+                                dt{{ $key }}.search(searchValue).draw();
+                            }, 500);
+                        });
+                        // Adjust columns on tab show
+                        $('a[data-toggle="tab"][href="#{{ $key }}"]').on('shown.bs.tab', function () {
+                            dt{{ $key }}.columns.adjust();
                         });
                     @else
                         $('#{{ $tableId }}-{{ $key }}').DataTable({
@@ -125,30 +174,54 @@
                 @endforeach
             @else
                 @if($enableAjaxPagination && $ajaxUrl)
-                    $('#{{ $tableId }}').DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: '{{ $ajaxUrl }}',
-                            type: 'GET'
-                        },
-                        columns: [
-                            @foreach($columns as $column)
-                                {
-                                    data: '{{ $column['key'] }}',
-                                    name: '{{ $column['key'] }}',
-                                    orderable: {{ isset($column['sortable']) && $column['sortable'] ? 'true' : 'false' }},
-                                    searchable: {{ isset($column['searchable']) && $column['searchable'] ? 'true' : 'false' }}
-                                },
-                            @endforeach
-                        ],
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        responsive: true,
-                        pageLength: 10,
-                        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
-                    });
+                        const tableEl = $('#{{ $tableId }}');
+                        const overlayEl = $('#{{ $tableId }}-overlay');
+                        const stateKey = '{{ $tableId }}_state';
+                        const dt = tableEl.DataTable({
+                            processing: false,
+                            serverSide: true,
+                            autoWidth: false,
+                            stateSave: true,
+                            stateDuration: 60 * 60 * 24, // 24 hours
+                            stateLoadCallback: function (settings) {
+                                var state = localStorage.getItem(stateKey);
+                                return state ? JSON.parse(state) : null;
+                            },
+                            stateSaveCallback: function (settings, data) {
+                                localStorage.setItem(stateKey, JSON.stringify(data));
+                            },
+                            ajax: {
+                                url: '{{ $ajaxUrl }}',
+                                type: 'GET'
+                            },
+                            columns: [
+                                @foreach($columns as $column)
+                                    {
+                                        data: '{{ $column['key'] }}',
+                                        name: '{{ $column['key'] }}',
+                                        orderable: {{ isset($column['sortable']) && $column['sortable'] ? 'true' : 'false' }},
+                                        searchable: {{ isset($column['searchable']) && $column['searchable'] ? 'true' : 'false' }}
+                                    },
+                                @endforeach
+                            ],
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            responsive: true,
+                            pageLength: 10,
+                            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                            preDrawCallback: function() { overlayEl.removeClass('d-none'); },
+                            drawCallback: function() { overlayEl.addClass('d-none'); dt.columns.adjust(); }
+                        });
+                        // Custom debounce for global search
+                        var searchTimer = null;
+                        $('#{{ $tableId }}_filter input').off('keyup.DT input.DT').on('keyup input', function(e) {
+                            var searchValue = this.value;
+                            clearTimeout(searchTimer);
+                            searchTimer = setTimeout(function() {
+                                dt.search(searchValue).draw();
+                            }, 500);
+                        });
                 @else
                     $('#{{ $tableId }}').DataTable({
                         paging: true,

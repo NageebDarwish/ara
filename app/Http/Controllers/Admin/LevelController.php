@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\LevelRequest;
 use App\Repositories\Admin\LevelRepository;
+use Yajra\DataTables\Facades\DataTables;
 
 class LevelController extends Controller
 {
@@ -18,9 +19,26 @@ class LevelController extends Controller
 
     public function index()
     {
-        $data = $this->repository->all();
+        return view('admin.modules.level.index');
+    }
 
-        return view('admin.modules.level.index', compact('data'));
+    public function getLevelsData(Request $request)
+    {
+        $levels = $this->repository->getLevelsForDataTable();
+
+        return DataTables::of($levels)
+            ->addIndexColumn()
+            ->addColumn('actions', function ($level) {
+                $actions = '<a href="' . route('admin.levels.edit', $level->id) . '" class="btn btn-warning btn-sm me-2" title="Edit Level"><i class="fa fa-edit"></i></a>';
+                $actions .= '<form method="POST" action="' . route('admin.levels.destroy', $level->id) . '" style="display:inline;" title="Delete Level">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-danger btn-sm delete-btn"><i class="fa fa-trash"></i></button>
+                </form>';
+                return $actions;
+            })
+            ->rawColumns(['actions'])
+            ->make(true);
     }
 
     public function create()
