@@ -9,6 +9,7 @@
             <div class="card-body">
                 <form action="{{ route('admin.blog.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="timezone" id="user_timezone" value="UTC">
                       <div class=" col-md-12">
                         <div class="form-group">
                             <label for="blog_category_id">Select Category</label>
@@ -105,6 +106,32 @@
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="status">Status *</label>
+                                <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
+                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                    <option value="scheduled" {{ old('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="published" {{ old('status', 'published') == 'published' ? 'selected' : '' }}>Publish Now</option>
+                                </select>
+                                @error('status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="published_at">Publish Date & Time (Your Local Time)</label>
+                                <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror"
+                                    id="published_at" name="published_at" value="{{ old('published_at') }}">
+                                <small class="form-text text-muted">Enter time in YOUR timezone. Server stores in UTC automatically.</small>
+                                @error('published_at')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class=" col-md-12">
 
                             <div class="form-group">
@@ -185,6 +212,10 @@
                 tabsize: 2,
                 height: null,
             });
+
+            // Auto-detect user's timezone
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('user_timezone').value = userTimezone;
         })();
     </script>
 @endsection

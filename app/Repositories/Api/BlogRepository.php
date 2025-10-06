@@ -16,11 +16,13 @@ class BlogRepository
 
        public function all()
     {
-          $latestIds = $this->model->orderBy('created_at', 'desc')
-        ->take(3)
-        ->pluck('id');
+          $latestIds = $this->model->where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->pluck('id');
 
-        return $this->model->orderBy('created_at', 'desc')
+        return $this->model->where('status', 'published')
+            ->orderBy('created_at', 'desc')
             ->when($latestIds->isNotEmpty(), function($query) use ($latestIds) {
                 return $query->whereNotIn('id', $latestIds);
             })
@@ -29,7 +31,8 @@ class BlogRepository
 
     public function latest()
     {
-        return $this->model->orderBy('created_at', 'desc')
+        return $this->model->where('status', 'published')
+            ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
     }
@@ -41,7 +44,9 @@ class BlogRepository
 
     public function findBySlug($slug)
     {
-        return $this->model->where('slug', $slug)->firstOrFail();
+        return $this->model->where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
     }
 
     public function related($id)
@@ -49,6 +54,7 @@ class BlogRepository
         $blog=$this->model->findOrFail($id);
         return $this->model->where('id','!=',$id)
             ->where('blog_category_id',$blog->blog_category_id)
+            ->where('status', 'published')
             ->orderBy('created_at', 'desc')
             ->take(6)
             ->get();
@@ -63,13 +69,15 @@ class BlogRepository
 
     public function categoryAll($ids)
     {
-        $latestIds = $this->model->orderBy('created_at', 'desc')
-        ->take(3)
-        ->pluck('id');
+        $latestIds = $this->model->where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->pluck('id');
 
-        return $this->model->whereHas('category',function($q)use($ids){
-            $q->whereIn('id',$ids);
-        })->orderBy('created_at', 'desc')
+        return $this->model->where('status', 'published')
+            ->whereHas('category',function($q)use($ids){
+                $q->whereIn('id',$ids);
+            })->orderBy('created_at', 'desc')
             ->when($latestIds->isNotEmpty(), function($query) use ($latestIds) {
                 return $query->whereNotIn('id', $latestIds);
             })

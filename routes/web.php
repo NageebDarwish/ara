@@ -128,8 +128,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
     Route::delete('contactus/{id}', [ContactUsController::class, 'destroy'])->name('contactus.destroy');
     Route::post('contactus/reply', [ContactUsController::class, 'reply'])->name('contactus.reply');
     Route::post('contactus/{id}/mark-as-read', [ContactUsController::class, 'markAsRead'])->name('contactus.markAsRead');
+    // Newsletter routes
     Route::get('newsletter', [NewsLetterController::class, 'index'])->name('newsletter.index');
-    Route::post('send/newsletter', [NewsLetterController::class, 'sendNewsLetter'])->name('newsletter.send');
+    Route::get('newsletter/data', [NewsLetterController::class, 'getNewslettersData'])->name('newsletter.data');
+    Route::get('newsletter/search-users', [NewsLetterController::class, 'searchUsers'])->name('newsletter.searchUsers');
+    Route::get('newsletter/create', [NewsLetterController::class, 'create'])->name('newsletter.create');
+    Route::post('newsletter', [NewsLetterController::class, 'store'])->name('newsletter.store');
+    Route::get('newsletter/{newsletter}/edit', [NewsLetterController::class, 'edit'])->name('newsletter.edit');
+    Route::put('newsletter/{newsletter}', [NewsLetterController::class, 'update'])->name('newsletter.update');
+    Route::delete('newsletter/{newsletter}', [NewsLetterController::class, 'destroy'])->name('newsletter.destroy');
 });
 
 Route::get('/admin/video/auth/google', [VideoController::class, 'googleAuth'])->name('admin.video.auth.google');

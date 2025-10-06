@@ -22,7 +22,7 @@ class BlogRepository
     public function getBlogsForDataTable()
     {
         return $this->model->with(['category'])
-            ->select(['id', 'blog_category_id', 'author', 'title', 'meta_title', 'slug', 'cover_image', 'created_at'])
+            ->select(['id', 'blog_category_id', 'author', 'title', 'meta_title', 'slug', 'cover_image', 'status', 'published_at', 'created_at'])
             ->orderBy('created_at', 'desc');
     }
 

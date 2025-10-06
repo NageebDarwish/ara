@@ -1,40 +1,53 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="mt-5">
-        <div class="card">
-            <div class="card-header ">
-                <h3 class="card-title">Send Newsletter</h3>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.newsletter.send') }}" method="POST">
-                    @csrf
+    <x-dynamic-table
+        title="Newsletters"
+        :createRoute="route('admin.newsletter.create')"
+        createButtonText="Create Newsletter"
+        tableId="newslettersTable"
+        :enableAjaxPagination="true"
+        :ajaxUrl="route('admin.newsletter.data')"
+        :columns="[
+            ['label' => '#', 'key' => 'DT_RowIndex', 'sortable' => false, 'searchable' => false],
+            ['label' => 'Subject', 'key' => 'subject', 'sortable' => true, 'searchable' => true],
+            ['label' => 'Recipients', 'key' => 'recipient_info', 'sortable' => false, 'searchable' => false],
+            ['label' => 'Status', 'key' => 'status_badge', 'sortable' => false, 'searchable' => false],
+            ['label' => 'Scheduled For', 'key' => 'scheduled_date', 'sortable' => false, 'searchable' => false],
+            ['label' => 'Sent At', 'key' => 'sent_date', 'sortable' => false, 'searchable' => false],
+            ['label' => 'Sent Count', 'key' => 'recipients_count', 'sortable' => true, 'searchable' => false],
+            ['label' => 'Actions', 'key' => 'actions', 'sortable' => false, 'searchable' => false],
+        ]"
+        :data="collect([])"
+    />
 
-                    <div class="form-group mb-4">
-                        <label for="subject" class="form-label">Subject</label>
-                        <input type="text" class="form-control @error('subject') is-invalid @enderror" id="subject"
-                            name="subject" placeholder="Enter email subject" required>
-                        @error('subject')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Convert UTC times to local timezone
+    function convertUTCToLocal() {
+        document.querySelectorAll('.local-time').forEach(function(element) {
+            const utcTime = element.getAttribute('data-utc');
+            if (utcTime) {
+                const date = new Date(utcTime);
+                const options = {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                element.textContent = date.toLocaleString('en-US', options);
+            }
+        });
+    }
 
-                    <div class="form-group mb-4">
-                        <label for="body" class="form-label">Content</label>
-                        <textarea class="form-control @error('body') is-invalid @enderror" id="body" name="body" rows="10"
-                            placeholder="Write your newsletter content here..." required></textarea>
-                        @error('body')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+    // Run on page load
+    convertUTCToLocal();
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary px-4 py-2">
-                            <i class="fas fa-paper-plane me-2"></i> Send Newsletter
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    // Run after DataTables draws (for AJAX loaded data)
+    $('#newslettersTable').on('draw.dt', function() {
+        setTimeout(convertUTCToLocal, 100);
+    });
+});
+</script>
 @endsection

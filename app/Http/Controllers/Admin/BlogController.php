@@ -44,6 +44,21 @@ class BlogController extends Controller
                     </div>
                 </div>';
             })
+            ->addColumn('status_badge', function ($blog) {
+                $badges = [
+                    'draft' => '<span class="badge badge-secondary">Draft</span>',
+                    'scheduled' => '<span class="badge badge-warning">Scheduled</span>',
+                    'published' => '<span class="badge badge-success">Published</span>',
+                ];
+                return $badges[$blog->status] ?? '<span class="badge badge-secondary">' . ucfirst($blog->status) . '</span>';
+            })
+            ->addColumn('publish_date', function ($blog) {
+                if ($blog->published_at) {
+                    // Return ISO format with data attribute for JS to convert to local time
+                    return '<span class="local-time" data-utc="' . $blog->published_at->toIso8601String() . '">' . $blog->published_at->format('d M Y H:i') . ' UTC</span>';
+                }
+                return 'N/A';
+            })
             ->addColumn('created', function ($blog) {
                 return $blog->created_at->format('d M Y');
             })
@@ -58,7 +73,7 @@ class BlogController extends Controller
                 $actions .= '</div>';
                 return $actions;
             })
-            ->rawColumns(['title_with_image', 'actions'])
+            ->rawColumns(['title_with_image', 'status_badge', 'publish_date', 'actions'])
             ->make(true);
     }
 
@@ -71,9 +86,19 @@ class BlogController extends Controller
     public function store(BlogRequest $request)
     {
         $data = $request->validated();
+
+        if ($data['status'] === 'published' && empty($data['published_at'])) {
+            $data['published_at'] = now();
+        } elseif ($data['status'] === 'scheduled' && !empty($data['published_at'])) {
+            // Parse as local time, then convert to UTC for storage
+            $data['published_at'] = \Carbon\Carbon::parse($data['published_at'], $request->input('timezone', 'UTC'))->utc();
+        } elseif ($data['status'] === 'draft') {
+            $data['published_at'] = null;
+        }
+
         $this->repository->create($data);
 
-        return redirect()->route('admin.blog.index')->with('success', 'Created successfully.');
+        return redirect()->route('admin.blog.index')->with('success', 'Blog post created successfully.');
     }
 
     public function edit($id)
@@ -87,9 +112,21 @@ class BlogController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all();
+
+        // Handle publish logic based on status
+        if ($data['status'] === 'published' && empty($data['published_at'])) {
+            $data['published_at'] = now();
+        } elseif ($data['status'] === 'scheduled' && !empty($data['published_at'])) {
+            // Parse as local time, then convert to UTC for storage
+            $data['published_at'] = \Carbon\Carbon::parse($data['published_at'], $request->input('timezone', 'UTC'))->utc();
+        } elseif ($data['status'] === 'draft') {
+            // Drafts don't need a publish date
+            $data['published_at'] = null;
+        }
+
         $this->repository->update($id, $data);
 
-        return redirect()->route('admin.blog.index')->with('success', 'Updated successfully.');
+        return redirect()->route('admin.blog.index')->with('success', 'Blog post updated successfully.');
     }
 
     public function destroy($id)
