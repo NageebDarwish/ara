@@ -280,6 +280,7 @@ public function create($playlistItems)
                         'title'       => $video['title'],
                         'description' => $video['description'],
                         'series_id'   => $playlist->id,
+                        'plan'        => 'new', // Explicitly set new videos to 'new' plan
                         'status'      => $video['publishAt'] ? 'schedule' : $video['status'],
                         'publishedAt' => $video['publishedAt'],
                         'publishAt'   => $video['publishAt'],

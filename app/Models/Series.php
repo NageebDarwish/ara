@@ -49,6 +49,14 @@ protected $with=['level','country','topic','guide','videos'];
         return $this->hasMany(SeriesVideo::class);
     }
 
+    // Public videos only (for API/users) - excludes plan='new'
+    public function publicVideos()
+    {
+        return $this->hasMany(SeriesVideo::class)
+            ->whereIn('plan', ['free', 'premium'])
+            ->where('status', 'public');
+    }
+
     public function seriesLists()
     {
         return $this->hasMany(SeriesList::class);

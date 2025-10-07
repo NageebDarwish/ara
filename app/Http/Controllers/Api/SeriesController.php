@@ -18,10 +18,10 @@ class SeriesController extends Controller
         $this->repository = $repository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return ExceptionHandlerHelper::tryCatch(function(){
-            $data=$this->repository->index();
+        return ExceptionHandlerHelper::tryCatch(function() use($request){
+            $data=$this->repository->index($request);
             return $this->sendResponse($data,'All series');
         });
     }
@@ -32,7 +32,7 @@ class SeriesController extends Controller
             return $this->sendResponse($data,'Series details');
         });
     }
-    
+
      public function addToWatched($id)
     {
         return ExceptionHandlerHelper::tryCatch(function() use($id) {

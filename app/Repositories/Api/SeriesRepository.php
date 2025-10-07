@@ -20,17 +20,39 @@ class SeriesRepository
         $this->badgeService = $badgeService;
     }
 
-    public function index()
+    public function index($request = null)
     {
-        $query= $this->model->with('country','videos.comments.user','videos.comments.likes');
+        $perPage = $request ? (int)($request->input('per_page')) ?: 15 : 15; // fallback used only when paginating
+
+        $query = $this->model->with([
+            'country',
+            'videos' => function($q) {
+                // Only show videos that are free or premium, not 'new'
+                $q->whereIn('plan', ['free', 'premium'])
+                  ->where('status', 'public');
+            },
+            'videos.comments.user',
+            'videos.comments.likes'
+        ]);
         $query->where('status','public');
         $query->whereNotNull('level_id');
+
+        // Only paginate when page or per_page is explicitly provided
+        if ($request && ($request->has('page') || $request->has('per_page'))) {
+            return $query->paginate($perPage);
+        }
 
         return $query->get();
     }
      public function show($id)
     {
-        return $this->model->findOrFail($id);
+        return $this->model->with([
+            'videos' => function($q) {
+                // Only show videos that are free or premium, not 'new'
+                $q->whereIn('plan', ['free', 'premium'])
+                  ->where('status', 'public');
+            }
+        ])->findOrFail($id);
     }
 
   public function addToWatched($id)
@@ -139,11 +161,13 @@ class SeriesRepository
                 'country',
                 'topic',
                 'videos' => function($query) {
-                    $query->whereDoesntHave('timeline', function ($q) {
-                        $q->where('user_id', auth()->id())
-                        ->where('is_completed', true);
-                    })
-                    ->with(['comments.user', 'comments.likes']);
+                    $query->whereIn('plan', ['free', 'premium']) // Only show free/premium videos
+                        ->where('status', 'public')
+                        ->whereDoesntHave('timeline', function ($q) {
+                            $q->where('user_id', auth()->id())
+                            ->where('is_completed', true);
+                        })
+                        ->with(['comments.user', 'comments.likes']);
                 }
             ])
             ->where('id', $id)

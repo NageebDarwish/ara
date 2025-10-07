@@ -24,6 +24,7 @@ class VideoRepository
 
     public function index($request)
     {
+        $perPage = (int)($request->input('per_page')) ?: 15; // fallback used only when paginating
 
         $query = $this->model::where('publishedAt', '<=', Carbon::now()->toISOString());
         $query->where('status','public');
@@ -36,11 +37,17 @@ class VideoRepository
                 $q->where('name', $request->input('topic'));
             });
         }
- $query->with(['comments.user','comments.likes']);
-  $query->orderBy('updated_at', 'desc');
+        $query->with(['comments.user','comments.likes']);
+        $query->orderBy('updated_at', 'desc');
+
+        // Only paginate when page or per_page is explicitly provided
+        if ($request->has('page') || $request->has('per_page')) {
+            return $query->paginate($perPage);
+        }
+
         return $query->get();
     }
-    
+
       public function hideWatchedVideo($request)
     {
        $query = $this->model::where('publishedAt', '<=', Carbon::now()->toISOString());
@@ -63,7 +70,7 @@ class VideoRepository
 
         return $query->get();
     }
-    
+
      public function addToWatched($id)
     {
         $video = $this->model::findOrFail($id);
@@ -182,7 +189,7 @@ class VideoRepository
         $totalHours = $totalSeconds / 3600;
         return $totalHours;
     }
-    
+
      public function videoHistory()
     {
         $user = auth()->user();
