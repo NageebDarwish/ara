@@ -16,11 +16,15 @@ use App\Http\Controllers\Api\StaticsController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\SeriesVideoListController;
 use App\Http\Controllers\Api\BadgeModalController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('page/{name}', [PageController::class, 'index']);
 Route::get('settings', [SettingController::class, 'index']);
 Route::get('plans', [PlanController::class, 'index']);
-Route::post('/stripe', [StripePaymentController::class, 'createPaymentIntent']);
+Route::post('stripe', [StripePaymentController::class, 'createPaymentIntent']);
+Route::post('stripe/checkout', [StripePaymentController::class, 'createCheckoutSession']);
+Route::post('stripe/confirm', [StripePaymentController::class, 'confirm']);
+Route::post('stripe/webhook', [StripePaymentController::class, 'webhook']);
 
 Route::post('contact-us', [ContactUsController::class, 'store']);
 Route::controller(AuthController::class)->group(function () {
