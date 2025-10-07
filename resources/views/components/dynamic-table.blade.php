@@ -107,7 +107,8 @@
                     @if($enableAjaxPagination && isset($tab['ajaxUrl']))
                         const tableEl{{ $key }} = $('#{{ $tableId }}-{{ $key }}');
                         const overlayEl{{ $key }} = $('#{{ $tableId }}-{{ $key }}-overlay');
-                        const stateKey{{ $key }} = '{{ $tableId }}_{{ $key }}_state';
+                        const colsSig{{ $key }} = '{{ implode(',', collect($tab['columns'])->pluck('key')->toArray()) }}';
+                        const stateKey{{ $key }} = '{{ $tableId }}_{{ $key }}_state_' + colsSig{{ $key }};
                         const dt{{ $key }} = tableEl{{ $key }}.DataTable({
                             processing: false,
                             serverSide: true,
@@ -176,7 +177,8 @@
                 @if($enableAjaxPagination && $ajaxUrl)
                         const tableEl = $('#{{ $tableId }}');
                         const overlayEl = $('#{{ $tableId }}-overlay');
-                        const stateKey = '{{ $tableId }}_state';
+                        const colsSig = '{{ implode(',', collect($columns)->pluck('key')->toArray()) }}';
+                        const stateKey = '{{ $tableId }}_state_' + colsSig;
                         const dt = tableEl.DataTable({
                             processing: false,
                             serverSide: true,
