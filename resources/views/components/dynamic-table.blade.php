@@ -165,12 +165,14 @@
                             dt{{ $key }}.columns.adjust();
                         });
                     @else
-                        $('#{{ $tableId }}-{{ $key }}').DataTable({
-                            paging: true,
-                            searching: true,
-                            ordering: true,
-                            responsive: true
-                        });
+                        if ('{{ $key }}' !== 'permissions') {
+                            $('#{{ $tableId }}-{{ $key }}').DataTable({
+                                paging: true,
+                                searching: true,
+                                ordering: true,
+                                responsive: true
+                            });
+                        }
                     @endif
                 @endforeach
             @else
