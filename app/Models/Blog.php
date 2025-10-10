@@ -36,27 +36,29 @@ class Blog extends Model
      */
     public function getCoverImageUrlAttribute()
     {
-        if (!$this->cover_image) {
+        $value = $this->attributes['cover_image'] ?? null;
+
+        if (!$value) {
             return null;
         }
 
         // If it's already a full URL, return as is
-        if (filter_var($this->cover_image, FILTER_VALIDATE_URL)) {
-            return $this->cover_image;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
         }
 
         // If it's a storage path, return the full URL
-        if (str_contains($this->cover_image, '/storage/')) {
-            return url($this->cover_image);
+        if (str_contains($value, '/storage/')) {
+            return url($value);
         }
 
         // For compressed images, use the optimized URL
-        if (str_contains($this->cover_image, '.webp') || str_contains($this->cover_image, '.jpg')) {
-            return \App\Helpers\ImageHelper::optimized($this->cover_image);
+        if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($value);
         }
 
         // Fallback to asset URL
-        return asset($this->cover_image);
+        return asset($value);
     }
 
     /**
@@ -66,7 +68,27 @@ class Blog extends Model
     {
         // If this is being accessed in an API context, return the full URL
         if (request()->is('api/*')) {
-            return $this->getCoverImageUrlAttribute();
+            if (!$value) {
+                return null;
+            }
+
+            // If it's already a full URL, return as is
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return $value;
+            }
+
+            // If it's a storage path, return the full URL
+            if (str_contains($value, '/storage/')) {
+                return url($value);
+            }
+
+            // For compressed images, use the optimized URL
+            if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+                return \App\Helpers\ImageHelper::optimized($value);
+            }
+
+            // Fallback to asset URL
+            return asset($value);
         }
 
         return $value;

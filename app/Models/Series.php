@@ -70,27 +70,29 @@ protected $with=['level','country','topic','guide','videos'];
      */
     public function getThumbnailUrlAttribute()
     {
-        if (!$this->thumbnail) {
+        $value = $this->attributes['thumbnail'] ?? null;
+
+        if (!$value) {
             return null;
         }
 
         // If it's already a full URL, return as is
-        if (filter_var($this->thumbnail, FILTER_VALIDATE_URL)) {
-            return $this->thumbnail;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
         }
 
         // If it's a storage path, return the full URL
-        if (str_contains($this->thumbnail, '/storage/')) {
-            return url($this->thumbnail);
+        if (str_contains($value, '/storage/')) {
+            return url($value);
         }
 
         // For compressed images, use the optimized URL
-        if (str_contains($this->thumbnail, '.webp') || str_contains($this->thumbnail, '.jpg')) {
-            return \App\Helpers\ImageHelper::optimized($this->thumbnail);
+        if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($value);
         }
 
         // Fallback to asset URL
-        return asset($this->thumbnail);
+        return asset($value);
     }
 
     /**
@@ -98,27 +100,29 @@ protected $with=['level','country','topic','guide','videos'];
      */
     public function getVerticalThumbnailUrlAttribute()
     {
-        if (!$this->vertical_thumbnail) {
+        $value = $this->attributes['vertical_thumbnail'] ?? null;
+
+        if (!$value) {
             return null;
         }
 
         // If it's already a full URL, return as is
-        if (filter_var($this->vertical_thumbnail, FILTER_VALIDATE_URL)) {
-            return $this->vertical_thumbnail;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
         }
 
         // If it's a storage path, return the full URL
-        if (str_contains($this->vertical_thumbnail, '/storage/')) {
-            return url($this->vertical_thumbnail);
+        if (str_contains($value, '/storage/')) {
+            return url($value);
         }
 
         // For compressed images, use the optimized URL
-        if (str_contains($this->vertical_thumbnail, '.webp') || str_contains($this->vertical_thumbnail, '.jpg')) {
-            return \App\Helpers\ImageHelper::optimized($this->vertical_thumbnail);
+        if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($value);
         }
 
         // Fallback to asset URL
-        return asset($this->vertical_thumbnail);
+        return asset($value);
     }
 
     /**
@@ -128,7 +132,27 @@ protected $with=['level','country','topic','guide','videos'];
     {
         // If this is being accessed in an API context, return the full URL
         if (request()->is('api/*')) {
-            return $this->getThumbnailUrlAttribute();
+            if (!$value) {
+                return null;
+            }
+
+            // If it's already a full URL, return as is
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return $value;
+            }
+
+            // If it's a storage path, return the full URL
+            if (str_contains($value, '/storage/')) {
+                return url($value);
+            }
+
+            // For compressed images, use the optimized URL
+            if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+                return \App\Helpers\ImageHelper::optimized($value);
+            }
+
+            // Fallback to asset URL
+            return asset($value);
         }
 
         return $value;
@@ -141,7 +165,27 @@ protected $with=['level','country','topic','guide','videos'];
     {
         // If this is being accessed in an API context, return the full URL
         if (request()->is('api/*')) {
-            return $this->getVerticalThumbnailUrlAttribute();
+            if (!$value) {
+                return null;
+            }
+
+            // If it's already a full URL, return as is
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return $value;
+            }
+
+            // If it's a storage path, return the full URL
+            if (str_contains($value, '/storage/')) {
+                return url($value);
+            }
+
+            // For compressed images, use the optimized URL
+            if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+                return \App\Helpers\ImageHelper::optimized($value);
+            }
+
+            // Fallback to asset URL
+            return asset($value);
         }
 
         return $value;

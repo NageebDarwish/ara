@@ -45,27 +45,29 @@ class Post extends Model
      */
     public function getFileUrlAttribute()
     {
-        if (!$this->file) {
+        $value = $this->attributes['file'] ?? null;
+
+        if (!$value) {
             return null;
         }
 
         // If it's already a full URL, return as is
-        if (filter_var($this->file, FILTER_VALIDATE_URL)) {
-            return $this->file;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
         }
 
         // If it's a storage path, return the full URL
-        if (str_contains($this->file, '/storage/')) {
-            return url($this->file);
+        if (str_contains($value, '/storage/')) {
+            return url($value);
         }
 
         // For compressed images, use the optimized URL
-        if (str_contains($this->file, '.webp') || str_contains($this->file, '.jpg')) {
-            return \App\Helpers\ImageHelper::optimized($this->file);
+        if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($value);
         }
 
         // Fallback to asset URL
-        return asset($this->file);
+        return asset($value);
     }
 
     /**
@@ -75,7 +77,27 @@ class Post extends Model
     {
         // If this is being accessed in an API context, return the full URL
         if (request()->is('api/*')) {
-            return $this->getFileUrlAttribute();
+            if (!$value) {
+                return null;
+            }
+
+            // If it's already a full URL, return as is
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return $value;
+            }
+
+            // If it's a storage path, return the full URL
+            if (str_contains($value, '/storage/')) {
+                return url($value);
+            }
+
+            // For compressed images, use the optimized URL
+            if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+                return \App\Helpers\ImageHelper::optimized($value);
+            }
+
+            // Fallback to asset URL
+            return asset($value);
         }
 
         return $value;

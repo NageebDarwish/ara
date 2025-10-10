@@ -147,27 +147,29 @@ class User extends Authenticatable
      */
     public function getProfileImageUrlAttribute()
     {
-        if (!$this->profile_image) {
+        $value = $this->attributes['profile_image'] ?? null;
+
+        if (!$value) {
             return null;
         }
 
         // If it's already a full URL, return as is
-        if (filter_var($this->profile_image, FILTER_VALIDATE_URL)) {
-            return $this->profile_image;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
         }
 
         // If it's a storage path, return the full URL
-        if (str_contains($this->profile_image, '/storage/')) {
-            return url($this->profile_image);
+        if (str_contains($value, '/storage/')) {
+            return url($value);
         }
 
         // For compressed images, use the optimized URL
-        if (str_contains($this->profile_image, '.webp') || str_contains($this->profile_image, '.jpg')) {
-            return \App\Helpers\ImageHelper::optimized($this->profile_image);
+        if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($value);
         }
 
         // Fallback to asset URL
-        return asset($this->profile_image);
+        return asset($value);
     }
 
     /**
@@ -177,7 +179,27 @@ class User extends Authenticatable
     {
         // If this is being accessed in an API context, return the full URL
         if (request()->is('api/*')) {
-            return $this->getProfileImageUrlAttribute();
+            if (!$value) {
+                return null;
+            }
+
+            // If it's already a full URL, return as is
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return $value;
+            }
+
+            // If it's a storage path, return the full URL
+            if (str_contains($value, '/storage/')) {
+                return url($value);
+            }
+
+            // For compressed images, use the optimized URL
+            if (str_contains($value, '.webp') || str_contains($value, '.jpg')) {
+                return \App\Helpers\ImageHelper::optimized($value);
+            }
+
+            // Fallback to asset URL
+            return asset($value);
         }
 
         return $value;
