@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Models\Series;
 use App\Models\SeriesVideo;
+use App\Models\Video;
 use GuzzleHttp\Client;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Storage;
@@ -269,23 +270,37 @@ public function create($playlistItems)
             );
 
             // Update or create videos in the playlist
-            foreach ($data['videos'] as $video) {
+            foreach ($data['videos'] as $videoData) {
+                // First, create or update the video in the videos table
+                $video = Video::updateOrCreate(
+                    ['video' => $videoData['videoId']], // Find by YouTube video ID
+                    [
+                        'title'            => $videoData['title'],
+                        'description'      => $videoData['description'],
+                        'level_id'         => $playlist->level_id,
+                        'guide_id'         => null, // Series don't have guide_id
+                        'topic_id'         => null, // Can be set manually later if needed
+                        'country_id'       => $playlist->country_id,
+                        'plan'             => 'new', // Default plan for new videos
+                        'publishedAt'      => $videoData['publishedAt'],
+                        'scheduleDateTime' => $videoData['publishAt'],
+                        'status'           => $videoData['publishAt'] ? 'schedule' : $videoData['status'],
+                        'duration'         => $videoData['duration'],
+                        'duration_seconds' => $videoData['duration_seconds'],
+                        'is_hide'          => false,
+                    ]
+                );
 
+                // Then, create or update the series_video relationship
                 SeriesVideo::updateOrCreate(
                     [
-                        'video'       => $video['videoId'],
-                        'playlist_id' => $playlist->id,
+                        'video_id'    => $video->id,
+                        'series_id'   => $playlist->id,
                     ],
                     [
-                        'title'       => $video['title'],
-                        'description' => $video['description'],
-                        'series_id'   => $playlist->id,
-                        'plan'        => 'new', // Explicitly set new videos to 'new' plan
-                        'status'      => $video['publishAt'] ? 'schedule' : $video['status'],
-                        'publishedAt' => $video['publishedAt'],
-                        'publishAt'   => $video['publishAt'],
-                        'duration'         => $video['duration'],
-                        'duration_seconds' => $video['duration_seconds'],
+                        'plan'        => 'new', // Admin can change this to free/premium
+                        'playlist_id' => $data['playlist']['playlistId'],
+                        'is_hide'     => false,
                     ]
                 );
             }
@@ -336,9 +351,12 @@ public function create($playlistItems)
             {
                 UploadFiles::delete($model->vertical_thumbnail,'series');
             }
-        foreach($model->videos as $video)
+        foreach($model->videos as $seriesVideo)
         {
-            $this->deleteVideoFromYouTube(youtubeVideoId: $video->video);
+            // Access the YouTube video ID through the video relationship
+            if ($seriesVideo->video) {
+                $this->deleteVideoFromYouTube(youtubeVideoId: $seriesVideo->video->video);
+            }
         }
         return $model->delete();
     }
@@ -358,5 +376,51 @@ public function create($playlistItems)
     public function convertYouTubeDurationToSeconds($duration) {
             $interval = new \DateInterval($duration);
             return ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+    }
+
+    public function assignVideoToSeries($seriesId, $videoId, $plan = 'new')
+    {
+        try {
+            $series = $this->model->findOrFail($seriesId);
+            $video = Video::findOrFail($videoId);
+
+            // Check if video is already assigned to this series
+            $existingAssignment = SeriesVideo::where('series_id', $seriesId)
+                ->where('video_id', $videoId)
+                ->first();
+
+            if ($existingAssignment) {
+                // Update the plan if it already exists
+                $existingAssignment->plan = $plan;
+                $existingAssignment->save();
+                return $existingAssignment;
+            }
+
+            // Create new assignment
+            $seriesVideo = SeriesVideo::create([
+                'series_id' => $seriesId,
+                'video_id' => $videoId,
+                'plan' => $plan,
+                'playlist_id' => $series->playlist_id,
+                'is_hide' => false,
+            ]);
+
+            return $seriesVideo;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to assign video to series: ' . $e->getMessage());
+        }
+    }
+
+    public function removeVideoFromSeries($seriesId, $videoId)
+    {
+        try {
+            $seriesVideo = SeriesVideo::where('series_id', $seriesId)
+                ->where('video_id', $videoId)
+                ->firstOrFail();
+
+            return $seriesVideo->delete();
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to remove video from series: ' . $e->getMessage());
+        }
     }
 }

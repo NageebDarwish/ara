@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Arabic All The Time - Free Member</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            line-height: 1.6;
+            letter-spacing: -0.02em;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #f0f2f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #0C3373 0%, #1a4d99 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+        }
+        .header:after {
+            content: "🎉";
+            font-size: 60px;
+            position: absolute;
+            top: -10px;
+            right: 30px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 38px;
+            font-weight: 700;
+            font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .header p {
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .badge {
+            background: linear-gradient(135deg, #1CC932 0%, #17a82a 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .card-title {
+            color: #0C3373;
+            font-size: 26px;
+            font-weight: 700;
+            font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+            margin: 0 0 20px 0;
+            letter-spacing: -0.02em;
+        }
+        .card-text {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+        .welcome-box {
+            background: linear-gradient(135deg, #F2CC08 0%, #FFD700 100%);
+            color: #0C3373;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .welcome-title {
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin: 0 0 15px 0;
+        }
+        .welcome-text {
+            font-size: 16px;
+            line-height: 1.7;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .feature-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: start;
+            gap: 15px;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .feature-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .feature-content h3 {
+            color: #0C3373;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+        .feature-content p {
+            color: #666;
+            font-size: 15px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .action-steps {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+        .action-steps h3 {
+            color: #0C3373;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+        }
+        .step-item {
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+        .step-number {
+            background: #FF7300;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+        .step-text {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            padding-top: 4px;
+        }
+        .upgrade-box {
+            background: linear-gradient(135deg, #FF7300 0%, #e66500 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .upgrade-title {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin: 0 0 15px 0;
+        }
+        .upgrade-text {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+        .upgrade-features {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        .upgrade-features li {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: white;
+            color: #FF7300;
+            padding: 16px 36px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            font-size: 17px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        .cta-button-primary {
+            background-color: #FF7300;
+            color: white;
+        }
+        .cta-button-primary:hover {
+            background-color: #e66500;
+        }
+        .signature {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .signature-name {
+            font-weight: 700;
+            color: #0C3373;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        .signature-title {
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .signature-contact {
+            color: #FF7300;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .signature-contact:hover {
+            text-decoration: underline;
+        }
+        .signature-tagline {
+            font-weight: 700;
+            color: #0C3373;
+            font-style: italic;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+        .footer {
+            background-color: #0C3373;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            font-size: 12px;
+            border-radius: 0 0 12px 12px;
+        }
+        .footer a {
+            color: #1CC932;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 0;
+            }
+            .header {
+                border-radius: 0;
+                padding: 40px 25px;
+            }
+            .header h1 {
+                font-size: 30px;
+            }
+            .content {
+                padding: 15px;
+            }
+            .card {
+                padding: 25px;
+            }
+            .footer {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>مرحباً بك! Welcome!</h1>
+            <p>Your Arabic journey starts now</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Welcome Card -->
+            <div class="card">
+                <div class="badge">FREE MEMBER</div>
+                <h2 class="card-title">You're Now Part of the AATT Family!</h2>
+                <p class="card-text">
+                    Hello <strong>[USER'S NAME]</strong>,
+                </p>
+                <p class="card-text">
+                    Welcome to Arabic All The Time! I'm thrilled to have you join our community of Arabic learners from around the world. You've just taken the first step toward acquiring Arabic naturally, effortlessly, and enjoyably.
+                </p>
+                
+                <div class="welcome-box">
+                    <div class="welcome-title">🌟 Your Free Membership Includes:</div>
+                    <div class="welcome-text">
+                        Access to our growing library of comprehensible input videos on YouTube, weekly newsletters with new content, and a supportive community of learners just like you!
+                    </div>
+                </div>
+            </div>
+
+            <!-- What You Get Card -->
+            <div class="card">
+                <h2 class="card-title">What's Included in Your Free Membership</h2>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <div class="feature-icon">🎬</div>
+                        <div class="feature-content">
+                            <h3>Full YouTube Library Access</h3>
+                            <p>Watch unlimited videos across all levels - beginner to advanced - completely free on our YouTube channel.</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">📧</div>
+                        <div class="feature-content">
+                            <h3>Weekly Newsletters</h3>
+                            <p>Get our newest video every week, plus acquisition tips, cultural insights, and motivational content.</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">💡</div>
+                        <div class="feature-content">
+                            <h3>Learning Resources</h3>
+                            <p>Access blog posts, guides, and articles about comprehensible input and language acquisition.</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-content">
+                            <h3>Community Access</h3>
+                            <p>Connect with fellow learners, share your progress, and get support on your journey.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Getting Started Card -->
+            <div class="card">
+                <h2 class="card-title">Your First Steps</h2>
+                
+                <div class="action-steps">
+                    <h3>🚀 Get Started Today:</h3>
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <strong>Visit our YouTube channel</strong> and watch your first beginner video. Don't worry about understanding everything—just enjoy!
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <strong>Subscribe to the channel</strong> so you never miss new content. We upload fresh videos regularly!
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <strong>Make it a daily habit</strong> - even just 10-15 minutes a day will transform your Arabic over time.
+                        </div>
+                    </div>
+                </div>
+
+                <center>
+                    <a href="https://www.youtube.com/@ArabicAllTheTime" class="cta-button cta-button-primary" target="_blank">Start Watching Now</a>
+                </center>
+            </div>
+
+            <!-- Upgrade Card -->
+            <div class="upgrade-box">
+                <div class="upgrade-title">🚀 Want to Accelerate Your Learning?</div>
+                <div class="upgrade-text">
+                    Upgrade to Premium and unlock exclusive features designed to maximize your acquisition:
+                </div>
+                <ul class="upgrade-features">
+                    <li>✓ Ad-free viewing experience</li>
+                    <li>✓ Downloadable content for offline learning</li>
+                    <li>✓ Priority access to new videos</li>
+                    <li>✓ Exclusive premium-only series and content</li>
+                    <li>✓ Progress tracking tools</li>
+                    <li>✓ Direct support from our team</li>
+                </ul>
+                <a href="http://www.arabicallthetime.com/premium" class="cta-button" target="_blank">Learn About Premium</a>
+            </div>
+
+            <!-- Signature Card -->
+            <div class="signature">
+                <div class="signature-name">Hasan Alhamwi</div>
+                <div class="signature-title">Founder/CEO</div>
+                <a href="mailto:info@arabicallthetime.com" class="signature-contact">info@arabicallthetime.com</a>
+                <a href="http://www.arabicallthetime.com" class="signature-contact" target="_blank">www.arabicallthetime.com</a>
+                <div class="signature-tagline">Effortless. Enjoyable. Immersive.</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 Arabic All The Time. All rights reserved.</p>
+            <p style="margin-top: 12px;">
+                <a href="https://www.youtube.com/@ArabicAllTheTime" target="_blank">YouTube</a> | 
+                <a href="http://www.arabicallthetime.com" target="_blank">Website</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; opacity: 0.8;">
+                You're receiving this because you signed up at arabicallthetime.com
+            </p>
+        </div>
+    </div>
+</body>
+</html>

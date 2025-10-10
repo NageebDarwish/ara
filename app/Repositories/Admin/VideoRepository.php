@@ -3,6 +3,8 @@
 namespace App\Repositories\Admin;
 
 use App\Models\Video;
+use App\Models\SeriesVideo;
+use App\Models\Series;
 use GuzzleHttp\Client;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Storage;
@@ -254,6 +256,51 @@ class VideoRepository
     public function convertYouTubeDurationToSeconds($duration) {
             $interval = new \DateInterval($duration);
             return ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+    }
+
+    /**
+     * Assign a video to a series
+     *
+     * @param int $videoId
+     * @param int $seriesId
+     */
+    public function assignToSeries($videoId, $seriesId)
+    {
+        try {
+            $video = $this->model->findOrFail($videoId);
+            $series = Series::findOrFail($seriesId);
+
+            // Remove all existing series assignments for this video
+            SeriesVideo::where('video_id', $videoId)->delete();
+
+            // Create new assignment using video's plan
+            SeriesVideo::create([
+                'video_id' => $videoId,
+                'series_id' => $seriesId,
+                'plan' => $video->plan ?? 'new',
+                'playlist_id' => $series->playlist_id,
+                'is_hide' => false,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to assign video to series: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove all series assignments for a video
+     *
+     * @param int $videoId
+     */
+    public function removeAllSeriesAssignments($videoId)
+    {
+        try {
+            SeriesVideo::where('video_id', $videoId)->delete();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to remove series assignments: ' . $e->getMessage());
+        }
     }
 
 }

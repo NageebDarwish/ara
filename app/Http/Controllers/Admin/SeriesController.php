@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SeriesRequest;
 use App\Repositories\Admin\SeriesRepository;
 use Illuminate\Http\Request;
-use App\Models\{Topic, Guide, Level, SeriesVideo};
+use App\Models\{Topic, Guide, Level, SeriesVideo, Video};
 use App\Models\Country;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -171,5 +171,61 @@ class SeriesController extends Controller
         return redirect()->back()->with('success', 'Series fetched successfully.');
     }
 
+    public function assignVideo(Request $request)
+    {
+        $request->validate([
+            'series_id' => 'required|exists:series,id',
+            'video_id' => 'required|exists:videos,id',
+            'plan' => 'required|in:new,free,premium',
+        ]);
+
+        try {
+            $this->repository->assignVideoToSeries(
+                $request->series_id,
+                $request->video_id,
+                $request->plan
+            );
+
+            return response()->json(['success' => true, 'message' => 'Video assigned to series successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function removeVideo(Request $request)
+    {
+        $request->validate([
+            'series_id' => 'required|exists:series,id',
+            'video_id' => 'required|exists:videos,id',
+        ]);
+
+        try {
+            $this->repository->removeVideoFromSeries(
+                $request->series_id,
+                $request->video_id
+            );
+
+            return response()->json(['success' => true, 'message' => 'Video removed from series successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function getAvailableVideos(Request $request)
+    {
+        $seriesId = $request->get('series_id');
+
+        // Get all videos that are not already in this series
+        $assignedVideoIds = SeriesVideo::where('series_id', $seriesId)->pluck('video_id');
+        $availableVideos = Video::whereNotIn('id', $assignedVideoIds)
+            ->with(['level', 'topic'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => ['videos' => $availableVideos]
+        ]);
+    }
 
 }

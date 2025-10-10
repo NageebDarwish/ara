@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -121,7 +122,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(CommentLike::class, 'user_id');
     }
-    
+
      public function givenPostLikes()
     {
         return $this->hasMany(PostLike::class,'user_id');
@@ -135,9 +136,50 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class,'user_id');
     }
-    
+
      public function badgeModals()
     {
         return $this->hasMany(BadgeModal::class);
+    }
+
+    /**
+     * Get the full URL for the profile image
+     */
+    public function getProfileImageUrlAttribute()
+    {
+        if (!$this->profile_image) {
+            return null;
+        }
+
+        // If it's already a full URL, return as is
+        if (filter_var($this->profile_image, FILTER_VALIDATE_URL)) {
+            return $this->profile_image;
+        }
+
+        // If it's a storage path, return the full URL
+        if (str_contains($this->profile_image, '/storage/')) {
+            return url($this->profile_image);
+        }
+
+        // For compressed images, use the optimized URL
+        if (str_contains($this->profile_image, '.webp') || str_contains($this->profile_image, '.jpg')) {
+            return \App\Helpers\ImageHelper::optimized($this->profile_image);
+        }
+
+        // Fallback to asset URL
+        return asset($this->profile_image);
+    }
+
+    /**
+     * Get the profile image URL for API responses
+     */
+    public function getProfileImageAttribute($value)
+    {
+        // If this is being accessed in an API context, return the full URL
+        if (request()->is('api/*')) {
+            return $this->getProfileImageUrlAttribute();
+        }
+
+        return $value;
     }
 }

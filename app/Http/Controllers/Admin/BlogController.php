@@ -34,9 +34,17 @@ class BlogController extends Controller
                 return $blog->category->name ?? 'N/A';
             })
             ->addColumn('title_with_image', function ($blog) {
+                $imageUrl = $blog->cover_image;
+
+                // if (str_contains($imageUrl, '/storage/uploads/')) {
+                //     $imageUrl = \App\Helpers\ImageHelper::optimized($imageUrl);
+                // } else {
+                    $imageUrl = asset($imageUrl);
+                // }
+
                 return '<div class="d-flex px-2 py-1">
                     <div>
-                        <img src="' . asset($blog->cover_image) . '" class="avatar avatar-sm me-3 border-radius-lg" alt="' . $blog->title . '">
+                        <img src="' . $imageUrl . '" class="avatar avatar-sm me-3 border-radius-lg" alt="' . $blog->title . '" loading="lazy">
                     </div>
                     <div class="d-flex flex-column justify-content-center mx-2">
                         <h6 class="mb-0 text-sm">' . $blog->title . '</h6>

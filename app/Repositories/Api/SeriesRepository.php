@@ -26,13 +26,8 @@ class SeriesRepository
 
         $query = $this->model->with([
             'country',
-            'videos' => function($q) {
-                // Only show videos that are free or premium, not 'new'
-                $q->whereIn('plan', ['free', 'premium'])
-                  ->where('status', 'public');
-            },
-            'videos.comments.user',
-            'videos.comments.likes'
+            'publicVideos.video.comments.user',
+            'publicVideos.video.comments.likes'
         ]);
         $query->where('status','public');
         $query->whereNotNull('level_id');
@@ -47,21 +42,17 @@ class SeriesRepository
      public function show($id)
     {
         return $this->model->with([
-            'videos' => function($q) {
-                // Only show videos that are free or premium, not 'new'
-                $q->whereIn('plan', ['free', 'premium'])
-                  ->where('status', 'public');
-            }
+            'publicVideos.video'
         ])->findOrFail($id);
     }
 
   public function addToWatched($id)
     {
-        $video = SeriesVideo::findOrFail($id);
+        $seriesVideo = SeriesVideo::findOrFail($id);
         $timeLine= VideoSeriesTimeline::where('series_video_id', $id)
             ->where('user_id', auth()->id())
             ->first();
-        $duration=$video->duration_seconds ?? 0;
+        $duration=$seriesVideo->video->duration_seconds ?? 0;
         if($timeLine && $timeLine->progress_time >= $duration){
             $timeLine->update([
                 'is_completed' => false,
@@ -84,7 +75,7 @@ class SeriesRepository
                     'progress_time' => $duration,
                     'date' => now(),
                     'is_completed' => true,
-                    'series_id'=>$video->series_id,
+                    'series_id'=>$seriesVideo->series_id,
                 ]);
 
             }
@@ -97,7 +88,7 @@ class SeriesRepository
                 ]);
             }
 
-                if ($video->created_at->diffInHours(now()) <= 24 && $timeLine->is_completed == 1) {
+                if ($seriesVideo->video && $seriesVideo->video->created_at->diffInHours(now()) <= 24 && $timeLine->is_completed == 1) {
                     $this->badgeService->assignSpecialAchievementBadge('first_ray');
                 }
 
@@ -154,20 +145,18 @@ class SeriesRepository
                                 ->count();
         return $completedSeriesCount;
     }
-   public function hideWatchedVideo($id)
+    public function hideWatchedVideo($id)
     {
         return $this->model::query()
             ->with([
                 'country',
                 'topic',
-                'videos' => function($query) {
-                    $query->whereIn('plan', ['free', 'premium']) // Only show free/premium videos
-                        ->where('status', 'public')
-                        ->whereDoesntHave('timeline', function ($q) {
+                'publicVideos' => function($query) {
+                    $query->whereDoesntHave('timeline', function ($q) {
                             $q->where('user_id', auth()->id())
                             ->where('is_completed', true);
                         })
-                        ->with(['comments.user', 'comments.likes']);
+                        ->with(['video.comments.user', 'video.comments.likes']);
                 }
             ])
             ->where('id', $id)

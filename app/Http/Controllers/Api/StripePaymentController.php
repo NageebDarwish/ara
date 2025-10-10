@@ -16,6 +16,7 @@ use App\Models\Subscription;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Stripe\Webhook;
+use App\Services\EmailService;
 
 class StripePaymentController extends Controller
 {
@@ -181,7 +182,7 @@ class StripePaymentController extends Controller
                     }
 
                     if ($userId) {
-                        Subscription::updateOrCreate(
+                        $subscription = Subscription::updateOrCreate(
                             ['user_id' => $userId],
                             [
                                 'plan_id' => $plan->id,
@@ -192,6 +193,18 @@ class StripePaymentController extends Controller
                                 'is_renewable' => true,
                             ]
                         );
+
+                        // Send premium welcome email if this is a premium plan
+                        if ($plan->is_premium ?? false) {
+                            try {
+                                $user = \App\Models\User::find($userId);
+                                if ($user) {
+                                    app(EmailService::class)->sendWelcomePremiumMember($user);
+                                }
+                            } catch (\Exception $e) {
+                                logger()->error('Failed to send premium welcome email: ' . $e->getMessage());
+                            }
+                        }
                     }
                 } catch (\Throwable $e) {
                     // Log and continue; webhook should still acknowledge

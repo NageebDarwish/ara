@@ -68,6 +68,19 @@
                 <span class="menu-title">Send News Letter</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#emailMenu" aria-expanded="false" aria-controls="emailMenu">
+                <span class="icon-bg"><i class="mdi mdi-email menu-icon"></i></span>
+                <span class="menu-title">Email System</span>
+                <i class="menu-arrow" style="transform: rotate(180deg)"></i>
+            </a>
+            <div class="collapse" id="emailMenu">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.email-templates.index') }}">Email Templates</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.newsletter-templates.index') }}">Newsletter Templates</a></li>
+                </ul>
+            </div>
+        </li>
          @if (auth()->user()->role === 'admin')
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.setting.index') }}">

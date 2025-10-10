@@ -79,6 +79,21 @@
 
                         <div class="col-md-12">
                             <div class="form-group">
+                                <label for="template_id">Use Template (Optional)</label>
+                                <select class="form-control" id="template_id" name="template_id">
+                                    <option value="">-- Start from Scratch --</option>
+                                    @foreach(\App\Models\NewsletterTemplate::where('is_active', true)->get() as $template)
+                                        <option value="{{ $template->id }}" data-subject="{{ $template->subject }}" data-html="{{ htmlspecialchars($template->html_content) }}">
+                                            {{ $template->name }} - {{ $template->subject }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Select a template to auto-fill subject and content. You can customize after selecting.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
                                 <label for="body">Content *</label>
                                 <textarea class="form-control @error('body') is-invalid @enderror summernote"
                                     id="body" name="body" rows="10" required>{{ old('body') }}</textarea>
@@ -190,6 +205,28 @@
                 placeholder: 'Type your newsletter content here...',
                 tabsize: 2,
                 height: 300,
+            });
+
+            // Handle template selection
+            $('#template_id').on('change', function() {
+                const selectedOption = $(this).find(':selected');
+                const subject = selectedOption.data('subject');
+                const html = selectedOption.data('html');
+
+                if (subject && html) {
+                    // Confirm before loading template
+                    if ($('#subject').val() || $('.summernote').summernote('code')) {
+                        if (!confirm('This will replace your current content. Continue?')) {
+                            $(this).val('');
+                            return;
+                        }
+                    }
+
+                    // Load template
+                    $('#subject').val(subject);
+                    $('.summernote').summernote('code', html);
+                    showToast('Template loaded successfully! You can now customize it.', 'success');
+                }
             });
         });
     </script>

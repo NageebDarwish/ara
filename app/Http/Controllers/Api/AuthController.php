@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\SendOtpMail;
 use Illuminate\Support\Facades\Mail;
 use App\Services\BadgeAssignmentService;
+use App\Services\EmailService;
 use Carbon\Carbon;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -24,10 +25,12 @@ class AuthController extends Controller
 {
     use ResponseTrait;
     protected $badgeService;
+    protected $emailService;
 
-    public function __construct(BadgeAssignmentService $badgeService)
+    public function __construct(BadgeAssignmentService $badgeService, EmailService $emailService)
     {
         $this->badgeService = $badgeService;
+        $this->emailService = $emailService;
     }
 
     public function login(Request $request)
@@ -108,6 +111,13 @@ public function register(Request $request)
             ]);
             Mail::to($user->email)->send(new SendOtpMail($otp));
 
+            // Send welcome email to new free member (async, won't block registration)
+            try {
+                $this->emailService->sendWelcomeFreeMember($user);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send welcome email: ' . $e->getMessage());
+            }
+
            return response()->json([
                      'data'=>$user,
                      'exists'=>false,
@@ -116,7 +126,7 @@ public function register(Request $request)
                      ]);
         });
     }
-   
+
 
        public function verifyOtp(Request $request)
     {
@@ -194,13 +204,13 @@ public function register(Request $request)
         });
     }
 
-  
+
 public function dashboardStatics()
 {
     return ExceptionHandlerHelper::tryCatch(function () {
         $user = auth()->user();
         $now = Carbon::now();
-        
+
         // ===== Weekly Breakdown (Grouped by Day of Week) =====
         $weeklyBreakdown = [];
         $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -316,7 +326,7 @@ public function dashboardStatics()
             'weekly_total' => $weeklyTotal,
             'monthly_total' => $monthlyTotal,
             'total_watched_video_count' => $totalWatchedVideoCount,
-            
+
             // Breakdowns for charts
             'weekly_breakdown' => $weeklyBreakdown,
             'monthly_breakdown' => $monthlyBreakdown,
@@ -366,16 +376,16 @@ public function dashboardStatics()
             return $this->sendResponse($user,'password updated successfully');
         });
     }
-    
+
      public function forgotPassword(Request $request)
     {
-        
+
         // return ExceptionHandlerHelper::tryCatch(function() use($request) {
             $request->validate([
                 'email' => 'required|exists:users,email',
             ]);
            $user = User::where('email', $request->email)->first();
-           
+
             $otp = rand(1000, 9999);
             $user->update(['otp' => $otp]);
             Mail::to($user->email)->send(new SendOtpMail($otp));

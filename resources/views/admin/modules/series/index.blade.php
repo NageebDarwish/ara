@@ -51,34 +51,30 @@
             type: 'GET',
             data: { series_id: seriesId },
                 success: function(response) {
+                    console.log(response);
                 if (response.success && response.data.videos.length > 0) {
                     let html = '';
-                    response.data.videos.forEach(function(video, index) {
+                    response.data.videos.forEach(function(seriesVideo, index) {
                         // Determine badge class based on plan
                         let badgeClass = 'badge-secondary';
-                        if (video.plan === 'premium') badgeClass = 'badge-success';
-                        else if (video.plan === 'free') badgeClass = 'badge-warning';
-                        else if (video.plan === 'new') badgeClass = 'badge-info';
+                        if (seriesVideo.plan === 'premium') badgeClass = 'badge-success';
+                        else if (seriesVideo.plan === 'free') badgeClass = 'badge-warning';
+                        else if (seriesVideo.plan === 'new') badgeClass = 'badge-info';
+
+                        // Access video data through the relationship
+                        const video = seriesVideo.video || {};
+                        const title = video.title || 'Untitled';
+                        const description = video.description || 'No description';
 
                         html += `
-                            <div class="card mb-3 ${video.plan === 'new' ? 'border-info' : ''}">
+                            <div class="card mb-3 ${seriesVideo.plan === 'new' ? 'border-info' : ''}">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div class="flex-grow-1">
-                                            <h5 class="card-title">${video.title}</h5>
-                                            <p class="card-text text-muted small">${video.description || 'No description'}</p>
+                                            <h5 class="card-title">${title}</h5>
+                                            <p class="card-text text-muted small">${description}</p>
                                         </div>
-                                        <span class="badge ${badgeClass} ml-2">${video.plan ? video.plan.charAt(0).toUpperCase() + video.plan.slice(1) : 'N/A'}</span>
                                     </div>
-                                    ${video.plan === 'new' ? '<div class="alert alert-info alert-sm mt-2 mb-2"><small><i class="fa fa-info-circle"></i> This video needs to be assigned a plan</small></div>' : ''}
-                                    <div class="mt-3">
-                                        <label class="font-weight-bold small">Assign Plan:</label>
-                                        <select class="form-control form-control-sm d-inline-block w-auto plan-select" data-video-id="${video.id}">
-                                            <option value="new" ${video.plan === 'new' ? 'selected' : ''}>New (Not Visible)</option>
-                                            <option value="free" ${video.plan === 'free' ? 'selected' : ''}>Free</option>
-                                            <option value="premium" ${video.plan === 'premium' ? 'selected' : ''}>Premium</option>
-                                        </select>
-                                </div>
                             </div>
                         </div>
                     `;

@@ -71,6 +71,18 @@
                         </select>
                     </div>
 
+                    <!-- Series/Playlist Assignment -->
+                    <div class="form-group">
+                        <label for="series_id">Series/Playlist</label>
+                        <select name="series_id" id="series_id" class="form-control">
+                            <option value="">Select Series</option>
+                            @foreach ($series as $s)
+                                <option value="{{ $s->id }}" {{ in_array($s->id, $assignedSeries) ? 'selected' : '' }}>
+                                    {{ $s->title }} {{ $s->level ? '- ' . $s->level->name : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <!-- Video Title -->
                     <div class="form-group">
@@ -118,4 +130,5 @@
             </div>
         </div>
     </div>
+
 @endsection

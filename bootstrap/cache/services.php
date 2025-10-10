@@ -33,6 +33,7 @@
     29 => 'Spatie\\Permission\\PermissionServiceProvider',
     30 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     31 => 'App\\Providers\\AppServiceProvider',
+    32 => 'App\\Providers\\ImageServiceProvider',
   ),
   'eager' => 
   array (
@@ -53,6 +54,7 @@
     14 => 'Spatie\\Permission\\PermissionServiceProvider',
     15 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     16 => 'App\\Providers\\AppServiceProvider',
+    17 => 'App\\Providers\\ImageServiceProvider',
   ),
   'deferred' => 
   array (

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\VideoRequest;
 use App\Repositories\Admin\VideoRepository;
 use Illuminate\Http\Request;
-use App\Models\{Topic, Guide, Level, Video};
+use App\Models\{Topic, Guide, Level, Video, Series, SeriesVideo};
 use App\Models\Country;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -97,8 +97,12 @@ class VideoController extends Controller
         $guides = Guide::all();
         $levels = Level::all();
         $countries = Country::all();
+        $series = Series::orderBy('title')->get();
 
-        return view('admin.modules.video.edit', compact('video', 'topics', 'countries', 'levels', 'guides'));
+        // Get the series that this video is assigned to (only first one for single select)
+        $assignedSeries = SeriesVideo::where('video_id', $id)->pluck('series_id')->toArray();
+
+        return view('admin.modules.video.edit', compact('video', 'topics', 'countries', 'levels', 'guides', 'series', 'assignedSeries'));
     }
     public function update(Request $request, $id)
     {
@@ -114,6 +118,14 @@ class VideoController extends Controller
             // }
 
             $this->repository->update($id, $data);
+
+            // Handle series assignment
+            if ($request->filled('series_id')) {
+                $this->repository->assignToSeries($id, $request->series_id);
+            } else {
+                // If no series selected, remove all assignments
+                $this->repository->removeAllSeriesAssignments($id);
+            }
 
             return redirect()->route('admin.video.index')->with('success', 'Video updated successfully.');
         } catch (Exception $e) {

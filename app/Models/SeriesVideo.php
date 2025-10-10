@@ -9,25 +9,23 @@ class SeriesVideo extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title',
-        'description',
-        'video',
         'series_id',
+        'video_id',
         'plan',
         'is_hide',
         'playlist_id',
-        'playlist_id',
-        'publishedAt',
-        'scheduleDateTime',
-        'status',
-        'duration',
-        'duration_seconds',
     ];
 
-    protected $with = ['timeline'];
+    protected $with = ['timeline', 'video'];
+
     public function series()
     {
         return $this->belongsTo(Series::class);
+    }
+
+    public function video()
+    {
+        return $this->belongsTo(Video::class);
     }
 
     public function downloadLists()

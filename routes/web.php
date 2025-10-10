@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\NewsLetterController;
+use App\Http\Controllers\Admin\EmailTemplateController;
+use App\Http\Controllers\Admin\NewsletterTemplateController;
 use App\Http\Controllers\Admin\ManagerController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -21,6 +23,7 @@ use App\Http\Controllers\Admin\ProfileController;
 Route::get('/', function () {
     return redirect()->route('admin.dashboard');
 });
+
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -98,6 +101,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
     Route::delete('series/{series}', [SeriesController::class, 'destroy'])->name('series.destroy');
     Route::post('series/updatePlan', [SeriesController::class, 'updatePlan'])->name('series.updatePlan');
     Route::get('series/getVideosWithPlan', [SeriesController::class, 'getVideosWithPlan'])->name('series.getVideosWithPlan');
+    Route::post('series/assignVideo', [SeriesController::class, 'assignVideo'])->name('series.assignVideo');
+    Route::post('series/removeVideo', [SeriesController::class, 'removeVideo'])->name('series.removeVideo');
+    Route::get('series/availableVideos', [SeriesController::class, 'getAvailableVideos'])->name('series.availableVideos');
 
     // Page routes
     Route::get('page', [PageController::class, 'index'])->name('page.index');
@@ -105,6 +111,23 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,manager'])->as('admin.')
     Route::get('page/{page}/edit', [PageController::class, 'edit'])->name('page.edit');
     Route::put('page/{page}', [PageController::class, 'update'])->name('page.update');
     Route::resource('setting', SettingController::class);
+
+    // Email Templates routes
+    Route::get('email-templates', [EmailTemplateController::class, 'index'])->name('email-templates.index');
+    Route::get('email-templates/data', [EmailTemplateController::class, 'getEmailTemplatesData'])->name('email-templates.data');
+    Route::get('email-templates/{id}/edit', [EmailTemplateController::class, 'edit'])->name('email-templates.edit');
+    Route::put('email-templates/{id}', [EmailTemplateController::class, 'update'])->name('email-templates.update');
+    Route::get('email-templates/{id}/preview', [EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::post('email-templates/toggle-status', [EmailTemplateController::class, 'toggleStatus'])->name('email-templates.toggle-status');
+    Route::get('email-templates/{id}/logs', [EmailTemplateController::class, 'logs'])->name('email-templates.logs');
+
+    // Newsletter Templates routes
+    Route::get('newsletter-templates', [NewsletterTemplateController::class, 'index'])->name('newsletter-templates.index');
+    Route::get('newsletter-templates/data', [NewsletterTemplateController::class, 'getTemplatesData'])->name('newsletter-templates.data');
+    Route::get('newsletter-templates/{id}/edit', [NewsletterTemplateController::class, 'edit'])->name('newsletter-templates.edit');
+    Route::put('newsletter-templates/{id}', [NewsletterTemplateController::class, 'update'])->name('newsletter-templates.update');
+    Route::get('newsletter-templates/{id}/preview', [NewsletterTemplateController::class, 'preview'])->name('newsletter-templates.preview');
+    Route::post('newsletter-templates/toggle-status', [NewsletterTemplateController::class, 'toggleStatus'])->name('newsletter-templates.toggle-status');
 
     /* manager users */
     Route::get('users', [UserController::class, 'index'])->name('users.index');

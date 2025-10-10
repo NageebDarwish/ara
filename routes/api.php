@@ -16,9 +16,12 @@ use App\Http\Controllers\Api\StaticsController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\SeriesVideoListController;
 use App\Http\Controllers\Api\BadgeModalController;
+use App\Http\Controllers\Api\FaqController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('page/{name}', [PageController::class, 'index']);
+Route::get('faq', [FaqController::class, 'index']);
+
 Route::get('settings', [SettingController::class, 'index']);
 Route::get('plans', [PlanController::class, 'index']);
 Route::post('stripe', [StripePaymentController::class, 'createPaymentIntent']);
